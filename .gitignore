@@ -1,0 +1,9 @@
+node_modules
+dist
+.astro
+.env
+*.log
+
+generated-images/
+.remember/
+.DS_Store

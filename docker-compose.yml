@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: didge-belgique:latest
+    restart: unless-stopped
+    ports:
+      # Expose en local sur 3000. Derrière ton reverse proxy (Nginx/Caddy/Traefik),
+      # tu peux mapper "127.0.0.1:3000:3000" pour ne pas exposer directement.
+      - "3000:3000"
+    environment:
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      BREVO_LIST_ID: ${BREVO_LIST_ID}
+      WHATSAPP_INVITE_URL: ${WHATSAPP_INVITE_URL}
+      PORT: 3000
+      STATIC_ROOT: /app/public

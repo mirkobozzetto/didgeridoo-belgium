@@ -1,0 +1,246 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout>
+  <div class="mx-auto flex min-h-[100dvh] max-w-7xl flex-col px-5 py-4 sm:px-8 lg:h-[100dvh]">
+    <!-- Barre haute -->
+    <header class="flex items-center justify-between border-b border-stone-900/10 pb-4">
+      <span class="text-[13.5px] font-extrabold tracking-[0.08em]">
+        <span class="text-stone-900">didgeridoo.</span><span class="text-flag-yellow">mirko</span><span class="text-stone-900">.</span><span class="text-flag-red">re</span>
+      </span>
+      <span class="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 md:block">
+        Stages&nbsp;&nbsp;·&nbsp;&nbsp;Concerts&nbsp;&nbsp;·&nbsp;&nbsp;Rencontres&nbsp;&nbsp;·&nbsp;&nbsp;Artisanat
+      </span>
+      <span class="inline-flex items-center gap-2 rounded-full bg-brand-100 py-1 pl-2.5 pr-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-200/70">
+        <span class="relative flex h-1.5 w-1.5">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60"></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-600"></span>
+        </span>
+        🇧🇪 Communauté belge
+      </span>
+    </header>
+
+    <!-- Titre éditorial -->
+    <section class="grid items-end gap-x-12 gap-y-3 py-7 sm:py-9 lg:grid-cols-[1fr_19rem]">
+      <h1 class="balance text-[clamp(2.4rem,5.2vw,3.8rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-stone-900">
+        Stages, concerts, didgeridoo&nbsp;:
+        <span class="relative inline-block text-brand-600">
+          c'est ici
+          <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 9" fill="none" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M2 7C60 2.5 140 2.5 198 6" stroke="var(--color-brand-300)" stroke-width="4" stroke-linecap="round"></path>
+          </svg>
+        </span>
+      </h1>
+      <div class="border-stone-900/10 lg:border-l lg:pb-1.5 lg:pl-6">
+        <p class="pretty text-[14px] leading-[1.7] text-stone-600">
+          La communauté belge du didgeridoo.
+          Reçois chaque stage, concert et rencontre en avant&#8209;première,
+          et rejoins le groupe&nbsp;WhatsApp.
+        </p>
+      </div>
+    </section>
+
+    <!-- Bande image + carte -->
+    <section class="relative min-h-0 flex-1 pb-1">
+      <div class="relative h-64 overflow-hidden rounded-3xl ring-1 ring-stone-900/10 sm:h-80 lg:h-full">
+        <img
+          src="/hero.jpeg"
+          alt="Joueur de didgeridoo au coucher du soleil"
+          class="h-full w-full object-cover object-[center_58%]"
+        />
+        <div class="grain pointer-events-none absolute inset-0 opacity-[0.13] mix-blend-overlay"></div>
+        <div class="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/15"></div>
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-brand-950/25 to-transparent"></div>
+      </div>
+
+      <!-- Carte formulaire -->
+      <form
+        id="subscribe"
+        novalidate
+        class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 transition-shadow duration-500 hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_32px_72px_-24px_rgb(28_25_23/0.5)] lg:absolute lg:bottom-7 lg:left-7 lg:mt-0 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
+      >
+        <span class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"></span>
+        <p class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600">Rejoindre</p>
+        <h2 class="balance mt-1.5 text-[19px] font-bold leading-snug tracking-tight text-stone-900">
+          Les prochains événements, en&nbsp;premier
+        </h2>
+
+        <div class="mt-5 flex flex-col gap-4">
+          <div class="grid grid-cols-2 gap-5">
+            <label class="field block pb-2">
+              <span class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">Prénom</span>
+              <input
+                type="text" name="firstname" autocomplete="given-name" placeholder="Ton prénom"
+                class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+              />
+            </label>
+            <label class="field block pb-2">
+              <span class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">Pays <span class="normal-case tracking-normal text-stone-300">(facultatif)</span></span>
+              <input
+                type="text" name="country" autocomplete="country-name" placeholder="Belgique"
+                class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+              />
+            </label>
+          </div>
+
+          <label class="field block pb-2">
+            <span class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">E-mail</span>
+            <input
+              type="email" name="email" required autocomplete="email" placeholder="toi@exemple.be"
+              class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+            />
+          </label>
+
+          <label class="flex items-start gap-2.5 text-[12px] leading-snug text-stone-500">
+            <input
+              type="checkbox" name="consent" required
+              class="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-brand-600"
+            />
+            <span class="pretty">J'accepte de recevoir les annonces d'événements par e&#8209;mail.
+            Désinscription en un&nbsp;clic.</span>
+          </label>
+
+          <div id="error" hidden class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700"></div>
+
+          <button
+            type="submit"
+            class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
+          >
+            Je rejoins la communauté
+            <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden="true">
+              <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.19l-3.72-3.72a.75.75 0 111.06-1.06l5 5a.75.75 0 010 1.06l-5 5a.75.75 0 11-1.06-1.06l3.72-3.72H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+
+          <p class="text-center text-[11.5px] text-stone-400">
+            Zéro spam · désinscription en un clic
+          </p>
+        </div>
+      </form>
+
+      <!-- Écran de succès : remplace la carte formulaire -->
+      <div
+        id="success"
+        hidden
+        class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 text-center shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 lg:absolute lg:bottom-7 lg:left-7 lg:mt-0 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
+      >
+        <span class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"></span>
+        <p class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600">Bienvenue</p>
+        <h2 class="balance mt-1.5 text-[19px] font-bold leading-snug tracking-tight text-stone-900">
+          Tu es sur la liste
+        </h2>
+        <p class="pretty mt-1.5 text-[13.5px] leading-relaxed text-stone-600">
+          Dernière étape : rejoins le groupe WhatsApp de la communauté.
+        </p>
+
+        <div id="qr" class="mx-auto mt-4 w-fit rounded-xl border border-stone-200 bg-white p-2.5 shadow-sm">
+          <!-- QR code injecté ici -->
+        </div>
+
+        <a
+          id="wa-link" href="#" target="_blank" rel="noopener"
+          class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3.5 text-[15px] font-semibold text-white shadow-sm transition hover:brightness-95"
+        >
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.2s-.8 1-1 1.2c-.2.2-.4.2-.7.1-1.8-.9-3-1.6-4.2-3.6-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5C9.5 8.8 8.9 7.4 8.6 6.8c-.2-.5-.4-.5-.7-.5h-.5c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.3 5.2 4.6 2 .8 2.7.9 3.6.8.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4M12 2a10 10 0 0 0-8.6 15l-1.3 4.8L7 20.5A10 10 0 1 0 12 2"/></svg>
+          Rejoindre le groupe WhatsApp
+        </a>
+        <p class="mt-2.5 text-[11.5px] text-stone-400">Scanne le QR code ou clique sur le bouton.</p>
+      </div>
+    </section>
+
+    <!-- Pied micro -->
+    <footer class="flex items-center justify-between border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400">
+      <span>Didgeridoo &amp; culture aborigène</span>
+      <span>Belgique · <span class="text-brand-600">WhatsApp</span></span>
+    </footer>
+  </div>
+
+  <script>
+    import QRCode from 'qrcode'
+
+    const form = document.getElementById('subscribe') as HTMLFormElement
+    const successEl = document.getElementById('success') as HTMLDivElement
+    const errorEl = document.getElementById('error') as HTMLDivElement
+    const qrEl = document.getElementById('qr') as HTMLDivElement
+    const waLink = document.getElementById('wa-link') as HTMLAnchorElement
+    const button = form.querySelector('button[type="submit"]') as HTMLButtonElement
+
+    // Vide = même origine (le serveur Hono sert front + API).
+    const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
+
+    const messages: Record<string, string> = {
+      invalid_email: 'Adresse e-mail invalide.',
+      consent_required: 'Merci de cocher la case de consentement.',
+      server_misconfigured: 'Service momentanément indisponible. Réessaie plus tard.',
+      brevo_error: "L'inscription a échoué. Réessaie dans un instant.",
+      network_error: 'Problème de connexion. Vérifie ton réseau et réessaie.',
+      default: 'Une erreur est survenue. Réessaie.',
+    }
+
+    function showError(msg: string) {
+      errorEl.hidden = false
+      errorEl.textContent = msg
+    }
+
+    async function showSuccess(whatsappUrl: string) {
+      form.hidden = true
+      successEl.hidden = false
+
+      if (whatsappUrl) {
+        waLink.href = whatsappUrl
+        try {
+          const dataUrl = await QRCode.toDataURL(whatsappUrl, {
+            width: 180,
+            margin: 1,
+            color: { dark: '#1c1917', light: '#ffffff' },
+          })
+          const img = document.createElement('img')
+          img.src = dataUrl
+          img.alt = 'QR code du groupe WhatsApp'
+          img.width = 180
+          img.height = 180
+          qrEl.replaceChildren(img)
+        } catch {
+          qrEl.hidden = true
+        }
+      } else {
+        qrEl.hidden = true
+        waLink.hidden = true
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const data = new FormData(form)
+      const payload = {
+        firstname: String(data.get('firstname') ?? ''),
+        email: String(data.get('email') ?? ''),
+        country: String(data.get('country') ?? ''),
+        consent: data.get('consent') === 'on',
+      }
+
+      button.disabled = true
+      errorEl.hidden = true
+
+      try {
+        const res = await fetch(`${API_BASE}/api/subscribe`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const json = await res.json().catch(() => ({}))
+
+        if (res.ok && json.ok) {
+          await showSuccess(json.whatsapp ?? '')
+        } else {
+          showError(messages[json.error] ?? messages.default)
+        }
+      } catch {
+        showError(messages.network_error)
+      } finally {
+        button.disabled = false
+      }
+    })
+  </script>
+</Layout>

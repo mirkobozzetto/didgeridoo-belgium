@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* Palette de la marque : tons clairs, chauds, une pointe d'orange.
+   flag-* : couleurs du drapeau belge, réservées au wordmark. */
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-brand-50: #fff7ed;
+  --color-brand-100: #ffedd5;
+  --color-brand-200: #fed7aa;
+  --color-brand-300: #fdba74;
+  --color-brand-400: #fb923c;
+  --color-brand-500: #f97316;
+  --color-brand-600: #ea580c;
+  --color-brand-700: #c2410c;
+  --color-brand-950: #431407;
+
+  --color-flag-yellow: #c9a10a;
+  --color-flag-red: #ef3340;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: #7c2d12;
+}
+
+.balance { text-wrap: balance; }
+.pretty { text-wrap: pretty; }
+
+/* Grain photographique léger posé sur l'image héro */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Champs du formulaire : soulignement fin qui passe à l'orange au focus */
+.field {
+  border-bottom: 1px solid rgb(214 211 209);
+  transition: border-color 0.25s;
+}
+.field:focus-within {
+  border-color: var(--color-brand-600);
+}
