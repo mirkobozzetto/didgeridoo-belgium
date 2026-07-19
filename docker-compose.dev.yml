@@ -1,0 +1,28 @@
+# Stack locale : make dev. restart "no" = rien ne se relance tout seul.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: didge-belgique:dev
+    restart: "no"
+    ports:
+      - "3000:3000"
+    environment:
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      BREVO_LIST_ID: ${BREVO_LIST_ID}
+      WHATSAPP_INVITE_URL: ${WHATSAPP_INVITE_URL}
+      POCKETBASE_URL: http://pocketbase:8090
+      PORT: 3000
+      STATIC_ROOT: /app/public
+
+  pocketbase:
+    build:
+      context: .
+      dockerfile: Dockerfile.pocketbase
+    image: didge-pocketbase:dev
+    restart: "no"
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pb_data:/pb/pb_data
