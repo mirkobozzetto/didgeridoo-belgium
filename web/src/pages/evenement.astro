@@ -1,0 +1,475 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout
+  title="Événement — Didgeridoo Belgique"
+  description="Stage, concert ou rencontre de la communauté belge du didgeridoo."
+>
+  <div class="mx-auto flex min-h-[100dvh] max-w-3xl flex-col px-5 py-4 sm:px-8">
+    <header
+      class="flex items-center justify-between border-b border-stone-900/10 pb-4"
+    >
+      <a href="/" class="text-[13.5px] font-extrabold tracking-[0.08em]">
+        <span class="text-stone-900">didge</span><span class="text-flag-yellow"
+          >ridoo</span
+        ><span class="text-flag-red">.top</span>
+      </a>
+      <nav class="flex items-center gap-4">
+        <a
+          href="/calendrier"
+          class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
+        >
+          ← Calendrier
+        </a>
+        <a
+          href="/proposer"
+          class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
+        >
+          Proposer un événement
+        </a>
+      </nav>
+    </header>
+
+    <main class="min-h-0 flex-1 py-7 sm:py-9">
+      <div id="loading" class="py-12 text-center text-[13px] text-stone-400">
+        Chargement…
+      </div>
+
+      <div
+        id="notfound"
+        hidden
+        class="rounded-2xl bg-white p-8 text-center ring-1 ring-stone-900/5"
+      >
+        <p class="text-[15px] font-semibold text-stone-900">
+          Événement introuvable
+        </p>
+        <p
+          class="pretty mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-stone-500"
+        >
+          Cet événement n'existe pas ou n'est plus disponible.
+        </p>
+        <a
+          href="/calendrier"
+          class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+        >
+          Voir le calendrier
+        </a>
+      </div>
+
+      <article id="event" hidden>
+        <div
+          id="poster-wrap"
+          class="relative mb-7 hidden h-64 overflow-hidden rounded-3xl ring-1 ring-stone-900/10 sm:h-80"
+        >
+          <img id="poster" src="" alt="" class="h-full w-full object-cover" />
+          <div
+            class="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/15"
+          >
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <p
+            id="date"
+            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-600"
+          >
+          </p>
+          <span
+            id="category"
+            hidden
+            class="inline-flex rounded-full bg-stone-100 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-stone-500"
+          ></span>
+        </div>
+        <h1
+          id="title"
+          class="balance mt-2 text-[clamp(2rem,4.5vw,3rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-stone-900"
+        >
+        </h1>
+        <p id="location" class="mt-3 hidden text-[15px] text-stone-600"></p>
+
+        <div
+          id="description"
+          class="pretty mt-6 text-[15px] leading-[1.75] text-stone-700"
+        >
+        </div>
+
+        <dl
+          id="meta"
+          class="mt-7 grid grid-cols-1 gap-px overflow-hidden rounded-2xl bg-stone-900/5 ring-1 ring-stone-900/5 sm:grid-cols-2"
+        >
+          <div id="price-cell" class="hidden bg-white px-5 py-4">
+            <dt
+              class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+            >
+              Tarif
+            </dt>
+            <dd
+              id="price"
+              class="mt-1 text-[15px] font-semibold text-stone-900"
+            >
+            </dd>
+          </div>
+          <div id="contact-cell" class="hidden bg-white px-5 py-4">
+            <dt
+              class="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+            >
+              Contact
+            </dt>
+            <dd id="contact" class="mt-1 text-[15px] text-stone-900"></dd>
+          </div>
+        </dl>
+
+        <a
+          id="register"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          hidden
+          class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px sm:w-auto"
+        >
+          S'inscrire à l'événement
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="h-4 w-4"
+            aria-hidden="true"
+            ><path
+              fill-rule="evenodd"
+              d="M2 10a.75.75 0 01.75-.75h12.19l-3.72-3.72a.75.75 0 111.06-1.06l5 5a.75.75 0 010 1.06l-5 5a.75.75 0 11-1.06-1.06l3.72-3.72H2.75A.75.75 0 012 10z"
+              clip-rule="evenodd"></path></svg
+          >
+        </a>
+
+        <div
+          class="mt-8 flex flex-wrap items-center gap-3 border-t border-stone-900/10 pt-6"
+        >
+          <a
+            id="agenda"
+            href="#"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:ring-brand-300 hover:text-brand-700"
+          >
+            🗓️ Ajouter à mon agenda
+          </a>
+          <a
+            id="share-wa"
+            href="#"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:brightness-95 active:translate-y-px"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-[18px] w-[18px]"
+              fill="currentColor"
+              aria-hidden="true"
+              ><path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+              ></path></svg
+            >
+            Partager
+          </a>
+          <button
+            id="copy"
+            type="button"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:ring-brand-300 hover:text-brand-700"
+          >
+            <span id="copy-label">Copier le lien</span>
+          </button>
+        </div>
+      </article>
+    </main>
+
+    <footer
+      class="mt-auto flex items-center justify-between border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400"
+    >
+      <span>Didgeridoo &amp; culture aborigène</span>
+      <span
+        >Belgique · <a
+          href="/calendrier"
+          class="text-brand-600 hover:text-brand-700">Calendrier</a
+        ></span
+      >
+    </footer>
+  </div>
+
+  <script>
+    type Session = { date: string; start: string; end: string | null }
+
+    type EventRecord = {
+      id: string
+      title: string
+      slug: string
+      start: string
+      end?: string
+      location?: string
+      description?: string
+      poster?: string
+      price?: string
+      registration_url?: string
+      contact?: string
+      category?: string
+      sessions?: Session[]
+    }
+
+    const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
+
+    const CATEGORIES: Record<string, string> = {
+      stage: 'Stage',
+      concert: 'Concert',
+      festival: 'Festival',
+      rencontre: 'Rencontre',
+      autre: 'Autre',
+    }
+
+    const loadingEl = document.getElementById('loading') as HTMLDivElement
+    const notFoundEl = document.getElementById('notfound') as HTMLDivElement
+    const articleEl = document.getElementById('event') as HTMLElement
+
+    const dateFmt = new Intl.DateTimeFormat('fr-BE', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    const sessionDayFmt = new Intl.DateTimeFormat('fr-BE', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+
+    function formatSession(s: Session): string {
+      const d = new Date(`${s.date}T00:00:00`)
+      if (Number.isNaN(d.getTime())) return s.date
+      const day = capitalize(sessionDayFmt.format(d))
+      const time = s.end ? `${s.start} - ${s.end}` : `dès ${s.start}`
+      return `${day} · ${time}`
+    }
+
+    // Pocketbase renvoie la date avec un espace, pas un ISO strict.
+    function parseDate(raw: string): Date {
+      return new Date(raw.replace(' ', 'T'))
+    }
+
+    function slugFromPath(): string {
+      const parts = location.pathname.split('/').filter(Boolean)
+      return decodeURIComponent(parts[parts.length - 1] ?? '')
+    }
+
+    function capitalize(s: string): string {
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    }
+
+    function dateLabel(ev: EventRecord): string {
+      const start = capitalize(dateFmt.format(parseDate(ev.start)))
+      if (!ev.end) return start
+      const end = parseDate(ev.end)
+      const endFmt = new Intl.DateTimeFormat('fr-BE', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+      return `${start} → ${endFmt.format(end)}`
+    }
+
+    // Insère la description en ne gardant qu'un balisage de mise en forme simple.
+    function renderDescription(container: HTMLElement, html: string) {
+      const allowed = new Set([
+        'P',
+        'BR',
+        'STRONG',
+        'B',
+        'EM',
+        'I',
+        'UL',
+        'OL',
+        'LI',
+        'A',
+      ])
+      const parsed = new DOMParser().parseFromString(html, 'text/html')
+
+      function clean(node: Node): Node | null {
+        if (node.nodeType === Node.TEXT_NODE) return node.cloneNode()
+        if (node.nodeType !== Node.ELEMENT_NODE) return null
+        const el = node as Element
+        if (!allowed.has(el.tagName)) {
+          const frag = document.createDocumentFragment()
+          for (const child of Array.from(el.childNodes)) {
+            const c = clean(child)
+            if (c) frag.appendChild(c)
+          }
+          return frag
+        }
+        const out = document.createElement(el.tagName.toLowerCase())
+        if (el.tagName === 'A') {
+          const href = el.getAttribute('href') ?? ''
+          if (/^https?:\/\//i.test(href)) {
+            out.setAttribute('href', href)
+            out.setAttribute('target', '_blank')
+            out.setAttribute('rel', 'noopener')
+            out.className = 'text-brand-600 underline'
+          }
+        }
+        for (const child of Array.from(el.childNodes)) {
+          const c = clean(child)
+          if (c) out.appendChild(c)
+        }
+        return out
+      }
+
+      container.replaceChildren()
+      for (const child of Array.from(parsed.body.childNodes)) {
+        const c = clean(child)
+        if (c) container.appendChild(c)
+      }
+    }
+
+    function render(ev: EventRecord) {
+      loadingEl.hidden = true
+
+      document.title = `${ev.title} — Didgeridoo Belgique`
+
+      if (ev.poster) {
+        const wrap = document.getElementById('poster-wrap') as HTMLDivElement
+        const img = document.getElementById('poster') as HTMLImageElement
+        img.src = `${API_BASE}/pb/api/files/events/${ev.id}/${ev.poster}`
+        img.alt = `Affiche : ${ev.title}`
+        wrap.classList.remove('hidden')
+      }
+
+      const dateEl = document.getElementById('date') as HTMLElement
+      if (Array.isArray(ev.sessions) && ev.sessions.length > 0) {
+        dateEl.replaceChildren()
+        for (const s of ev.sessions) {
+          const line = document.createElement('span')
+          line.className = 'block'
+          line.textContent = formatSession(s)
+          dateEl.appendChild(line)
+        }
+      } else {
+        dateEl.textContent = dateLabel(ev)
+      }
+
+      if (ev.category && CATEGORIES[ev.category]) {
+        const cat = document.getElementById('category') as HTMLElement
+        cat.textContent = CATEGORIES[ev.category]
+        cat.hidden = false
+      }
+
+      ;(document.getElementById('title') as HTMLElement).textContent = ev.title
+
+      if (ev.location) {
+        const loc = document.getElementById('location') as HTMLElement
+        loc.textContent = ev.location
+        loc.classList.remove('hidden')
+      }
+
+      if (ev.description) {
+        renderDescription(
+          document.getElementById('description') as HTMLElement,
+          ev.description,
+        )
+      }
+
+      if (ev.price) {
+        ;(document.getElementById('price') as HTMLElement).textContent =
+          ev.price
+        document.getElementById('price-cell')!.classList.remove('hidden')
+      }
+      if (ev.contact) {
+        ;(document.getElementById('contact') as HTMLElement).textContent =
+          ev.contact
+        document.getElementById('contact-cell')!.classList.remove('hidden')
+      }
+
+      if (ev.registration_url && /^https?:\/\//i.test(ev.registration_url)) {
+        const reg = document.getElementById('register') as HTMLAnchorElement
+        reg.href = ev.registration_url
+        reg.hidden = false
+      }
+
+      const pageUrl = location.href
+      const agenda = document.getElementById('agenda') as HTMLAnchorElement
+      agenda.href = `/evenements/${ev.slug}.ics`
+
+      const shareText = `${ev.title} — ${pageUrl}`
+      const shareWa = document.getElementById('share-wa') as HTMLAnchorElement
+      shareWa.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`
+
+      const copyBtn = document.getElementById('copy') as HTMLButtonElement
+      const copyLabel = document.getElementById('copy-label') as HTMLSpanElement
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pageUrl)
+          copyLabel.textContent = 'Lien copié !'
+        } catch {
+          copyLabel.textContent = 'Copie impossible'
+        }
+        setTimeout(() => {
+          copyLabel.textContent = 'Copier le lien'
+        }, 2000)
+      })
+
+      articleEl.hidden = false
+    }
+
+    async function load() {
+      const slug = slugFromPath()
+      if (!slug) {
+        loadingEl.hidden = true
+        notFoundEl.hidden = false
+        return
+      }
+      const filter = encodeURIComponent(
+        `(slug='${slug}' && status='published')`,
+      )
+      const url = `${API_BASE}/pb/api/collections/events/records?filter=${filter}`
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const json = await res.json()
+        const ev = (json.items ?? [])[0] as EventRecord | undefined
+        if (!ev) {
+          loadingEl.hidden = true
+          notFoundEl.hidden = false
+          return
+        }
+        render(ev)
+      } catch {
+        loadingEl.hidden = true
+        notFoundEl.hidden = false
+      }
+    }
+
+    load()
+  </script>
+
+  <style>
+    #description p {
+      margin: 0 0 0.75rem;
+    }
+    #description p:last-child {
+      margin-bottom: 0;
+    }
+    #description ul {
+      list-style: disc;
+      padding-left: 1.4rem;
+      margin: 0 0 0.75rem;
+    }
+    #description ol {
+      list-style: decimal;
+      padding-left: 1.4rem;
+      margin: 0 0 0.75rem;
+    }
+    #description li {
+      margin: 0.15rem 0;
+    }
+    #description strong,
+    #description b {
+      font-weight: 700;
+    }
+  </style>
+</Layout>

@@ -2,7 +2,8 @@
 feature: Plateforme événements participative didgeridoo Belgique
 slug: evenements-participatifs
 type: prd
-status: ready
+status: shipped
+shipped_at: 2026-07-20T10:05:00Z
 stepsCompleted: [0, 1, 2, 3, 4]
 next_action: "Agenda participatif en ligne : organisateurs proposent, Mirko valide, communauté consulte et partage"
 resume_cmd: "/ship docs/prd/evenements-participatifs"

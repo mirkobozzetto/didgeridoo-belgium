@@ -3,156 +3,369 @@ import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout>
-  <div class="mx-auto flex min-h-[100dvh] max-w-7xl flex-col px-5 py-4 sm:px-8 lg:h-[100dvh]">
-    <!-- Barre haute -->
-    <header class="flex items-center justify-between border-b border-stone-900/10 pb-4">
-      <span class="text-[13.5px] font-extrabold tracking-[0.08em]">
-        <span class="text-stone-900">didgeridoo.</span><span class="text-flag-yellow">mirko</span><span class="text-stone-900">.</span><span class="text-flag-red">re</span>
-      </span>
-      <span class="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 md:block">
-        Stages&nbsp;&nbsp;·&nbsp;&nbsp;Concerts&nbsp;&nbsp;·&nbsp;&nbsp;Rencontres&nbsp;&nbsp;·&nbsp;&nbsp;Artisanat
-      </span>
-      <span class="inline-flex items-center gap-2 rounded-full bg-brand-100 py-1 pl-2.5 pr-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-200/70">
-        <span class="relative flex h-1.5 w-1.5">
-          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60"></span>
-          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-600"></span>
-        </span>
-        🇧🇪 Communauté belge
-      </span>
-    </header>
-
-    <!-- Titre éditorial -->
-    <section class="grid items-end gap-x-12 gap-y-3 py-7 sm:py-9 lg:grid-cols-[1fr_19rem]">
-      <h1 class="balance text-[clamp(2.4rem,5.2vw,3.8rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-stone-900">
-        Stages, concerts, didgeridoo&nbsp;:
-        <span class="relative inline-block text-brand-600">
-          c'est ici
-          <svg class="absolute -bottom-2 left-0 w-full" viewBox="0 0 200 9" fill="none" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M2 7C60 2.5 140 2.5 198 6" stroke="var(--color-brand-300)" stroke-width="4" stroke-linecap="round"></path>
-          </svg>
-        </span>
-      </h1>
-      <div class="border-stone-900/10 lg:border-l lg:pb-1.5 lg:pl-6">
-        <p class="pretty text-[14px] leading-[1.7] text-stone-600">
-          La communauté belge du didgeridoo.
-          Reçois chaque stage, concert et rencontre en avant&#8209;première,
-          et rejoins le groupe&nbsp;WhatsApp.
-        </p>
-      </div>
-    </section>
-
-    <!-- Bande image + carte -->
-    <section class="relative min-h-0 flex-1 pb-1">
-      <div class="relative h-64 overflow-hidden rounded-3xl ring-1 ring-stone-900/10 sm:h-80 lg:h-full">
-        <img
-          src="/hero.jpeg"
-          alt="Joueur de didgeridoo au coucher du soleil"
-          class="h-full w-full object-cover object-[center_58%]"
-        />
-        <div class="grain pointer-events-none absolute inset-0 opacity-[0.13] mix-blend-overlay"></div>
-        <div class="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/15"></div>
-        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-brand-950/25 to-transparent"></div>
-      </div>
-
-      <!-- Carte formulaire -->
-      <form
-        id="subscribe"
-        novalidate
-        class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 transition-shadow duration-500 hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_32px_72px_-24px_rgb(28_25_23/0.5)] lg:absolute lg:bottom-7 lg:left-7 lg:mt-0 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
+  <div class="mx-auto max-w-7xl px-5 pb-12 sm:px-8">
+    <!-- Écran d'accueil : plein viewport, hero + formulaire -->
+    <div class="flex min-h-[100dvh] flex-col py-4 lg:h-[100dvh]">
+      <!-- Barre haute -->
+      <header
+        class="flex items-center justify-between border-b border-stone-900/10 pb-4"
       >
-        <span class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"></span>
-        <p class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600">Rejoindre</p>
-        <h2 class="balance mt-1.5 text-[19px] font-bold leading-snug tracking-tight text-stone-900">
-          Les prochains événements, en&nbsp;premier
-        </h2>
-
-        <div class="mt-5 flex flex-col gap-4">
-          <div class="grid grid-cols-2 gap-5">
-            <label class="field block pb-2">
-              <span class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">Prénom</span>
-              <input
-                type="text" name="firstname" autocomplete="given-name" placeholder="Ton prénom"
-                class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
-              />
-            </label>
-            <label class="field block pb-2">
-              <span class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">Pays <span class="normal-case tracking-normal text-stone-300">(facultatif)</span></span>
-              <input
-                type="text" name="country" autocomplete="country-name" placeholder="Belgique"
-                class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
-              />
-            </label>
-          </div>
-
-          <label class="field block pb-2">
-            <span class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400">E-mail</span>
-            <input
-              type="email" name="email" required autocomplete="email" placeholder="toi@exemple.be"
-              class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
-            />
-          </label>
-
-          <label class="flex items-start gap-2.5 text-[12px] leading-snug text-stone-500">
-            <input
-              type="checkbox" name="consent" required
-              class="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-brand-600"
-            />
-            <span class="pretty">J'accepte de recevoir les annonces d'événements par e&#8209;mail.
-            Désinscription en un&nbsp;clic.</span>
-          </label>
-
-          <div id="error" hidden class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700"></div>
-
-          <button
-            type="submit"
-            class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
+        <span class="text-[13.5px] font-extrabold tracking-[0.08em]">
+          <span class="text-stone-900">didge</span><span
+            class="text-flag-yellow">ridoo</span
+          ><span class="text-flag-red">.top</span>
+        </span>
+        <nav class="hidden items-center gap-5 md:flex">
+          <a
+            href="/calendrier"
+            class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
           >
-            Je rejoins la communauté
-            <svg viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden="true">
-              <path fill-rule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.19l-3.72-3.72a.75.75 0 111.06-1.06l5 5a.75.75 0 010 1.06l-5 5a.75.75 0 11-1.06-1.06l3.72-3.72H2.75A.75.75 0 012 10z" clip-rule="evenodd"></path>
-            </svg>
-          </button>
+            Calendrier des événements&nbsp;→
+          </a>
+          <a
+            href="/connexion"
+            class="rounded-full border border-stone-900/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition-colors hover:border-brand-600 hover:text-brand-600"
+          >
+            Se connecter
+          </a>
+        </nav>
+        <span
+          class="inline-flex items-center gap-2 rounded-full bg-brand-100 py-1 pl-2.5 pr-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-200/70"
+        >
+          <span class="relative flex h-1.5 w-1.5">
+            <span
+              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60"
+            ></span>
+            <span
+              class="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-600"
+            ></span>
+          </span>
+          🇧🇪 Communauté belge
+        </span>
+      </header>
 
-          <p class="text-center text-[11.5px] text-stone-400">
-            Zéro spam · désinscription en un clic
+      <!-- Titre éditorial -->
+      <section
+        class="grid items-end gap-x-12 gap-y-3 py-7 sm:py-9 lg:grid-cols-[1fr_19rem]"
+      >
+        <h1
+          class="balance text-[clamp(2.4rem,5.2vw,3.8rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-stone-900"
+        >
+          Stages, concerts, didgeridoo&nbsp;:
+          <span class="relative inline-block text-brand-600">
+            c'est ici
+            <svg
+              class="absolute -bottom-2 left-0 w-full"
+              viewBox="0 0 200 9"
+              fill="none"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M2 7C60 2.5 140 2.5 198 6"
+                stroke="var(--color-brand-300)"
+                stroke-width="4"
+                stroke-linecap="round"></path>
+            </svg>
+          </span>
+        </h1>
+        <div class="border-stone-900/10 lg:border-l lg:pb-1.5 lg:pl-6">
+          <p class="pretty text-[14px] leading-[1.7] text-stone-600">
+            La communauté belge du didgeridoo. Reçois chaque stage, concert et
+            rencontre en avant&#8209;première, et rejoins le
+            groupe&nbsp;WhatsApp.
           </p>
         </div>
-      </form>
+      </section>
 
-      <!-- Écran de succès : remplace la carte formulaire -->
-      <div
-        id="success"
-        hidden
-        class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 text-center shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 lg:absolute lg:bottom-7 lg:left-7 lg:mt-0 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
-      >
-        <span class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"></span>
-        <p class="text-left text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600">Bienvenue</p>
-        <h2 class="balance mt-1.5 text-left text-[19px] font-bold leading-snug tracking-tight text-stone-900">
-          Tu es sur la liste
-        </h2>
-        <p class="pretty mt-1.5 text-left text-[13px] leading-relaxed text-stone-600">
-          Dernière étape&nbsp;: scanne le QR code depuis ton téléphone,
-          ou clique sur le bouton.
-        </p>
-
-        <div class="mt-5 flex items-center justify-center rounded-xl bg-stone-50 py-5 ring-1 ring-inset ring-stone-900/5">
-          <div id="qr" class="rounded-lg bg-white p-2 shadow-sm ring-1 ring-stone-900/5">
-            <!-- QR code injecté ici -->
+      <!-- Bande image + carte -->
+      <section class="relative min-h-0 flex-1 pb-1">
+        <div
+          class="relative h-64 overflow-hidden rounded-3xl ring-1 ring-stone-900/10 sm:h-80 lg:h-full"
+        >
+          <img
+            src="/hero.jpeg"
+            alt="Joueur de didgeridoo au coucher du soleil"
+            class="h-full w-full object-cover object-[center_58%]"
+          />
+          <div
+            class="grain pointer-events-none absolute inset-0 opacity-[0.13] mix-blend-overlay"
+          >
+          </div>
+          <div
+            class="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/15"
+          >
+          </div>
+          <div
+            class="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-brand-950/25 to-transparent"
+          >
           </div>
         </div>
 
-        <a
-          id="wa-link" href="#" target="_blank" rel="noopener"
-          class="mt-4 inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:brightness-95 active:translate-y-px"
+        <!-- Carte formulaire -->
+        <form
+          id="subscribe"
+          novalidate
+          class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 transition-shadow duration-500 hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_32px_72px_-24px_rgb(28_25_23/0.5)] lg:absolute lg:bottom-7 lg:left-7 lg:mt-0 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
         >
-          <svg viewBox="0 0 24 24" class="h-[22px] w-[22px]" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-          Rejoindre le groupe WhatsApp
+          <span
+            class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+          ></span>
+          <p
+            class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+          >
+            Rejoindre
+          </p>
+          <h2
+            class="balance mt-1.5 text-[19px] font-bold leading-snug tracking-tight text-stone-900"
+          >
+            Les prochains événements, en&nbsp;premier
+          </h2>
+
+          <div class="mt-5 flex flex-col gap-4">
+            <div class="grid grid-cols-2 gap-5">
+              <label class="field block pb-2">
+                <span
+                  class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+                  >Prénom</span
+                >
+                <input
+                  type="text"
+                  name="firstname"
+                  autocomplete="given-name"
+                  placeholder="Ton prénom"
+                  class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+                />
+              </label>
+              <label class="field block pb-2">
+                <span
+                  class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+                  >Pays <span class="normal-case tracking-normal text-stone-300"
+                    >(facultatif)</span
+                  ></span
+                >
+                <input
+                  type="text"
+                  name="country"
+                  autocomplete="country-name"
+                  placeholder="Belgique"
+                  class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+                />
+              </label>
+            </div>
+
+            <label class="field block pb-2">
+              <span
+                class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+                >E-mail</span
+              >
+              <input
+                type="email"
+                name="email"
+                required
+                autocomplete="email"
+                placeholder="toi@exemple.be"
+                class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+              />
+            </label>
+
+            <label
+              class="flex items-start gap-2.5 text-[12px] leading-snug text-stone-500"
+            >
+              <input
+                type="checkbox"
+                name="consent"
+                required
+                class="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-brand-600"
+              />
+              <span class="pretty"
+                >J'accepte de recevoir les annonces d'événements par
+                e&#8209;mail. Désinscription en un&nbsp;clic.</span
+              >
+            </label>
+
+            <div
+              id="error"
+              hidden
+              class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700"
+            >
+            </div>
+
+            <button
+              type="submit"
+              class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
+            >
+              Je rejoins la communauté
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                class="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M2 10a.75.75 0 01.75-.75h12.19l-3.72-3.72a.75.75 0 111.06-1.06l5 5a.75.75 0 010 1.06l-5 5a.75.75 0 11-1.06-1.06l3.72-3.72H2.75A.75.75 0 012 10z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </button>
+
+            <p class="text-center text-[11.5px] text-stone-400">
+              Zéro spam · désinscription en un clic
+            </p>
+          </div>
+        </form>
+
+        <!-- Écran de succès : remplace la carte formulaire -->
+        <div
+          id="success"
+          hidden
+          class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 text-center shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 lg:absolute lg:bottom-7 lg:left-7 lg:mt-0 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
+        >
+          <span
+            class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+          ></span>
+          <p
+            class="text-left text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+          >
+            Bienvenue
+          </p>
+          <h2
+            class="balance mt-1.5 text-left text-[19px] font-bold leading-snug tracking-tight text-stone-900"
+          >
+            Tu es sur la liste
+          </h2>
+          <p
+            class="pretty mt-1.5 text-left text-[13px] leading-relaxed text-stone-600"
+          >
+            Dernière étape&nbsp;: scanne le QR code depuis ton téléphone, ou
+            clique sur le bouton.
+          </p>
+
+          <div
+            class="mt-5 flex items-center justify-center rounded-xl bg-stone-50 py-5 ring-1 ring-inset ring-stone-900/5"
+          >
+            <div
+              id="qr"
+              class="rounded-lg bg-white p-2 shadow-sm ring-1 ring-stone-900/5"
+            >
+              <!-- QR code injecté ici -->
+            </div>
+          </div>
+
+          <a
+            id="wa-link"
+            href="#"
+            target="_blank"
+            rel="noopener"
+            class="mt-4 inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:brightness-95 active:translate-y-px"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              class="h-[22px] w-[22px]"
+              fill="currentColor"
+              aria-hidden="true"
+              ><path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+              ></path></svg
+            >
+            Rejoindre le groupe WhatsApp
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <!-- Agenda : prochains événements -->
+    <section class="border-t border-stone-900/[0.07] py-12 sm:py-16">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p
+            class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+          >
+            Agenda
+          </p>
+          <h2
+            class="balance mt-1.5 text-[clamp(1.7rem,3.6vw,2.4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-stone-900"
+          >
+            Prochains événements
+          </h2>
+        </div>
+        <a
+          href="/calendrier"
+          class="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600 sm:inline-block"
+        >
+          Voir tout le calendrier&nbsp;→
+        </a>
+      </div>
+
+      <div id="ev-loading" class="py-12 text-center text-[13px] text-stone-400">
+        Chargement des événements…
+      </div>
+
+      <div
+        id="ev-empty"
+        hidden
+        class="mt-8 rounded-2xl bg-white p-8 text-center ring-1 ring-stone-900/5"
+      >
+        <p class="text-[15px] font-semibold text-stone-900">
+          Les prochains stages et concerts arrivent ici
+        </p>
+        <a
+          href="/calendrier"
+          class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+        >
+          Voir le calendrier
+        </a>
+      </div>
+
+      <div
+        id="ev-error"
+        hidden
+        class="mt-8 rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-center text-[13px] text-red-700"
+      >
+        Impossible de charger les événements. Réessaie dans un instant.
+      </div>
+
+      <div
+        id="ev-grid"
+        hidden
+        class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      >
+      </div>
+
+      <div id="ev-cta" hidden class="mt-10 flex justify-center">
+        <a
+          href="/calendrier"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:text-brand-700 hover:ring-brand-300 active:translate-y-px"
+        >
+          Voir tout le calendrier
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            class="h-4 w-4"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M2 10a.75.75 0 01.75-.75h12.19l-3.72-3.72a.75.75 0 111.06-1.06l5 5a.75.75 0 010 1.06l-5 5a.75.75 0 11-1.06-1.06l3.72-3.72H2.75A.75.75 0 012 10z"
+              clip-rule="evenodd"></path>
+          </svg>
         </a>
       </div>
     </section>
 
+    <p class="pt-4 text-center text-[12px] text-stone-400 sm:text-left">
+      Tu organises un stage ou un concert ?
+      <a
+        href="/proposer"
+        class="font-semibold text-brand-600 hover:text-brand-700"
+        >Propose ton événement</a
+      >
+    </p>
+
     <!-- Pied micro -->
-    <footer class="flex items-center justify-between border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400">
+    <footer
+      class="flex items-center justify-between border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400"
+    >
       <span>Didgeridoo &amp; culture aborigène</span>
       <span>Belgique · <span class="text-brand-600">WhatsApp</span></span>
     </footer>
@@ -166,7 +379,9 @@ import Layout from '../layouts/Layout.astro'
     const errorEl = document.getElementById('error') as HTMLDivElement
     const qrEl = document.getElementById('qr') as HTMLDivElement
     const waLink = document.getElementById('wa-link') as HTMLAnchorElement
-    const button = form.querySelector('button[type="submit"]') as HTMLButtonElement
+    const button = form.querySelector(
+      'button[type="submit"]',
+    ) as HTMLButtonElement
 
     // Vide = même origine (le serveur Hono sert front + API).
     const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
@@ -174,7 +389,8 @@ import Layout from '../layouts/Layout.astro'
     const messages: Record<string, string> = {
       invalid_email: 'Adresse e-mail invalide.',
       consent_required: 'Merci de cocher la case de consentement.',
-      server_misconfigured: 'Service momentanément indisponible. Réessaie plus tard.',
+      server_misconfigured:
+        'Service momentanément indisponible. Réessaie plus tard.',
       brevo_error: "L'inscription a échoué. Réessaie dans un instant.",
       network_error: 'Problème de connexion. Vérifie ton réseau et réessaie.',
       default: 'Une erreur est survenue. Réessaie.',
@@ -244,5 +460,161 @@ import Layout from '../layouts/Layout.astro'
         button.disabled = false
       }
     })
+  </script>
+
+  <script>
+    type Session = { date: string; start: string; end: string | null }
+
+    type EventRecord = {
+      id: string
+      title: string
+      slug: string
+      start: string
+      location?: string
+      poster?: string
+      category?: string
+      sessions?: Session[]
+    }
+
+    const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
+
+    const CATEGORIES: Record<string, string> = {
+      stage: 'Stage',
+      concert: 'Concert',
+      festival: 'Festival',
+      rencontre: 'Rencontre',
+      autre: 'Autre',
+    }
+
+    const loadingEl = document.getElementById('ev-loading') as HTMLDivElement
+    const emptyEl = document.getElementById('ev-empty') as HTMLDivElement
+    const errorEl = document.getElementById('ev-error') as HTMLDivElement
+    const gridEl = document.getElementById('ev-grid') as HTMLDivElement
+    const ctaEl = document.getElementById('ev-cta') as HTMLDivElement
+
+    const dayFmt = new Intl.DateTimeFormat('fr-BE', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+    const timeFmt = new Intl.DateTimeFormat('fr-BE', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+
+    function nowUtcFilter(): string {
+      return new Date().toISOString().slice(0, 19).replace('T', ' ')
+    }
+
+    function parseDate(raw: string): Date {
+      return new Date(raw.replace(' ', 'T'))
+    }
+
+    function posterUrl(ev: EventRecord): string | null {
+      if (!ev.poster) return null
+      return `${API_BASE}/pb/api/files/events/${ev.id}/${ev.poster}`
+    }
+
+    function capitalize(s: string): string {
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    }
+
+    function eventCard(ev: EventRecord): HTMLAnchorElement {
+      const a = document.createElement('a')
+      a.href = `/evenements/${ev.slug}`
+      a.className =
+        'group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-stone-900/5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(28_25_23/0.4)] hover:ring-brand-200'
+
+      const thumb = document.createElement('div')
+      thumb.className =
+        'relative aspect-[4/3] w-full overflow-hidden bg-brand-100'
+      const src = posterUrl(ev)
+      if (src) {
+        const img = document.createElement('img')
+        img.src = src
+        img.alt = `Affiche : ${ev.title}`
+        img.loading = 'lazy'
+        img.className = 'h-full w-full object-cover'
+        thumb.appendChild(img)
+      } else {
+        thumb.innerHTML =
+          '<span class="flex h-full w-full items-center justify-center text-3xl">🪘</span>'
+      }
+
+      const body = document.createElement('div')
+      body.className = 'flex min-w-0 flex-col gap-1 p-4'
+
+      const start = parseDate(ev.start)
+      const dateLine = document.createElement('p')
+      dateLine.className =
+        'text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-600'
+      dateLine.textContent = `${capitalize(dayFmt.format(start))} · ${timeFmt.format(start)}`
+
+      body.appendChild(dateLine)
+
+      const extra =
+        Array.isArray(ev.sessions) && ev.sessions.length > 1
+          ? ev.sessions.length - 1
+          : 0
+      if (extra > 0) {
+        const more = document.createElement('p')
+        more.className = 'text-[12px] text-stone-400'
+        more.textContent = `+${extra} autre${extra > 1 ? 's' : ''} date${extra > 1 ? 's' : ''}`
+        body.appendChild(more)
+      }
+
+      const title = document.createElement('h3')
+      title.className =
+        'text-[16px] font-bold leading-snug tracking-tight text-stone-900'
+      title.textContent = ev.title
+
+      body.appendChild(title)
+
+      if (ev.category && CATEGORIES[ev.category]) {
+        const badge = document.createElement('span')
+        badge.className =
+          'mt-0.5 inline-flex w-fit rounded-full bg-stone-100 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-stone-500'
+        badge.textContent = CATEGORIES[ev.category]
+        body.appendChild(badge)
+      }
+
+      if (ev.location) {
+        const loc = document.createElement('p')
+        loc.className = 'truncate text-[13px] text-stone-500'
+        loc.textContent = ev.location
+        body.appendChild(loc)
+      }
+
+      a.append(thumb, body)
+      return a
+    }
+
+    async function load() {
+      const filter = encodeURIComponent(
+        `(status='published' && start >= '${nowUtcFilter()}')`,
+      )
+      const url = `${API_BASE}/pb/api/collections/events/records?filter=${filter}&sort=start&perPage=6`
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const json = await res.json()
+        const events = (json.items ?? []) as EventRecord[]
+        loadingEl.hidden = true
+
+        if (events.length === 0) {
+          emptyEl.hidden = false
+          return
+        }
+
+        for (const ev of events) gridEl.appendChild(eventCard(ev))
+        gridEl.hidden = false
+        ctaEl.hidden = false
+      } catch {
+        loadingEl.hidden = true
+        errorEl.hidden = false
+      }
+    }
+
+    load()
   </script>
 </Layout>

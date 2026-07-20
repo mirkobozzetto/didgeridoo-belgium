@@ -1,9 +1,10 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Palette de la marque : tons clairs, chauds, une pointe d'orange.
    flag-* : couleurs du drapeau belge, réservées au wordmark. */
 @theme {
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --color-brand-50: #fff7ed;
   --color-brand-100: #ffedd5;
@@ -23,13 +24,32 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Tailwind v4 met cursor: default sur les boutons : on rétablit le
+   feedback cliquable partout, une fois pour toutes. */
+button:not(:disabled),
+[role='button'],
+summary,
+select,
+label[for],
+input[type='file']::file-selector-button,
+a {
+  cursor: pointer;
+}
+[contenteditable] {
+  cursor: text;
+}
+
 ::selection {
   background: var(--color-brand-200);
   color: #7c2d12;
 }
 
-.balance { text-wrap: balance; }
-.pretty { text-wrap: pretty; }
+.balance {
+  text-wrap: balance;
+}
+.pretty {
+  text-wrap: pretty;
+}
 
 /* Grain photographique léger posé sur l'image héro */
 .grain {

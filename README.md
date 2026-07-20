@@ -1,119 +1,119 @@
-# Didgeridoo & Culture Aborigène — Belgique
+# didgeridoo.top - Didgeridoo & Culture Aborigène en Belgique
 
-Landing page (lead magnet) qui capture des e-mails, les envoie dans **Brevo**
-(liste + double opt-in possible), puis affiche le **lien du groupe WhatsApp**.
+Site communautaire : landing d'inscription (Brevo + groupe WhatsApp) et
+agenda participatif des événements didgeridoo (stages, concerts,
+festivals, rencontres) proposés par les organisateurs et modérés par le
+super admin.
 
-- **Front** : Astro (site statique)
-- **Backend** : Hono sur Bun — endpoint `POST /api/subscribe`
-- **Déploiement** : un seul conteneur Docker (Bun sert le statique **et** l'API)
+- **Front** : Astro (statique) + Tailwind CSS v4 - dossier `web/`
+- **Backend** : Hono sur Bun - dossier `server/`
+- **Données** : Pocketbase (comptes organisateurs, événements, uploads)
+- **Emails** : Brevo (liste de contacts + campagnes newsletter)
+- **Déploiement** : Docker Compose (app + Pocketbase + backup)
 
 ## Architecture
 
 ```
-Navigateur ──▶ Astro (statique)  ┐
-                                 ├─ servis par le MÊME serveur Hono/Bun
-POST /api/subscribe ─────────────┘        (port 3000)
-        │
-        └──▶ Brevo  POST https://api.brevo.com/v3/contacts
-                    (crée/actualise le contact + ajout à la liste)
+Navigateur ──▶ Astro (statique)          ┐
+POST /api/subscribe (Brevo)              ├─ Hono/Bun (port 3000)
+/api/newsletter/* (aperçu + envoi)       │
+/evenements/<slug> (OG) + <slug>.ics     │
+/pb/* ── proxy ──▶ Pocketbase (8090)     ┘
 ```
 
-Un seul port à exposer, un seul conteneur : idéal derrière ton reverse proxy.
+Un seul port public (3000). Pocketbase n'est jamais exposé directement :
+le navigateur passe par le proxy `/pb/*` (même origine, zéro CORS).
 
-## Prérequis Brevo
+## Fonctionnalités
 
-1. Crée un compte Brevo puis une **liste** de contacts (Contacts > Listes).
-   Note son **ID** (colonne ID) → `BREVO_LIST_ID`.
-2. Génère une **clé API v3** (Paramètres > SMTP & API > Clés API) → `BREVO_API_KEY`.
-3. Récupère le **lien d'invitation** de ton groupe WhatsApp → `WHATSAPP_INVITE_URL`.
+- **Landing** : inscription e-mail -> Brevo + QR/lien WhatsApp,
+  section « Prochains événements ».
+- **Calendrier public** `/calendrier` : événements publiés à venir,
+  filtres par catégorie, fiches à URL stable avec Open Graph
+  (cartes riches WhatsApp), partage et export ICS.
+- **Espace organisateur** : compte (`/connexion`), proposition
+  d'événement (`/proposer`, dates multiples au quart d'heure via
+  calendrier Cally, éditeur riche, affiche), suivi et corrections
+  (`/mes-propositions`).
+- **Admin** (superuser Pocketbase) : modération (`/admin`, approuver /
+  refuser avec motif obligatoire), newsletter (`/admin/newsletter`,
+  blocs événements + aperçu + envoi campagne Brevo).
+- Une seule connexion : un compte présent dans `users` ET `_superusers`
+  porte les deux casquettes (pastille Admin).
 
-## Configuration
+## Lancer en local
 
 ```bash
-cp .env.example .env
-# puis édite .env avec tes vraies valeurs
+cp .env.example .env      # remplir les valeurs
+make dev                  # site : http://localhost:3000
+                          # admin Pocketbase : http://localhost:8090/_/
+make logs                 # suivre les logs
+make stop                 # tout arrêter
 ```
 
-## Lancer en local (dev, sans Docker)
-
-Deux terminaux :
+Premier lancement : créer le superadmin Pocketbase :
 
 ```bash
-# Terminal 1 — front
-cd web && bun install && bun run dev        # http://localhost:4321
-
-# Terminal 2 — backend
-cd server && bun install && \
-  BREVO_API_KEY=... BREVO_LIST_ID=1 WHATSAPP_INVITE_URL=... bun run dev
+docker exec didgeridoo-belgium-pocketbase-1 \
+  /pb/pocketbase superuser upsert admin@exemple.be <motdepasse> \
+  --dir /pb/pb_data
 ```
 
-En dev, configure le front pour taper l'API du backend en ajoutant
-`PUBLIC_API_BASE=http://localhost:3000` dans `web/.env`.
+Le schéma (collections `events`, règles d'accès, hooks) est versionné
+dans `pb_migrations/` et `pb_hooks/`, appliqué automatiquement au
+démarrage de Pocketbase.
 
-## Déploiement sur le VPS (Docker)
+### Dev front seul (hot reload)
 
 ```bash
-# 1. Copier le dossier sur le VPS (git clone, scp, rsync…)
-# 2. Créer le .env (voir ci-dessus)
-# 3. Builder et lancer
+cd web && bun install && bun run dev     # http://localhost:4321
+# web/.env : PUBLIC_API_BASE=http://localhost:3000
+```
+
+## Qualité
+
+```bash
+make format    # Prettier (80 colonnes, plugin Astro) sur web + server
+make check     # astro check (web) + tsc --noEmit (server)
+```
+
+Un hook git `pre-commit` (voir `.githooks/`) formate automatiquement les
+fichiers stagés. Il est activé par :
+
+```bash
+git config core.hooksPath .githooks
+```
+
+## Variables d'environnement
+
+| Variable              | Rôle                                            |
+| --------------------- | ----------------------------------------------- |
+| `BREVO_API_KEY`       | Clé API v3 Brevo                                |
+| `BREVO_LIST_ID`       | ID de la liste Brevo cible                      |
+| `BREVO_SENDER_EMAIL`  | Expéditeur des campagnes newsletter             |
+| `BREVO_SENDER_NAME`   | Nom d'expéditeur des campagnes                  |
+| `WHATSAPP_INVITE_URL` | Lien d'invitation du groupe WhatsApp            |
+| `POCKETBASE_URL`      | URL interne de Pocketbase (compose : service)   |
+| `PUBLIC_API_BASE`     | (front) vide = même origine ; sinon URL de l'API |
+
+## Déploiement VPS
+
+```bash
+cp .env.example .env      # remplir
 docker compose up -d --build
-
-# Vérifier
-curl http://localhost:3000/api/health      # -> {"ok":true}
+curl http://localhost:3000/api/health    # -> {"ok":true}
 ```
 
-Le service écoute sur `:3000`. Branche ton reverse proxy dessus, par ex. **Caddy** :
+- L'app écoute sur `:3000` (reverse proxy Caddy/Nginx devant).
+- Pocketbase est bindé sur `127.0.0.1:8090` : admin UI accessible via
+  tunnel SSH uniquement.
+- `pb-backup` archive `pb_data` chaque jour dans `backups/`
+  (rétention 14 jours).
+- Créer le superadmin en prod avec la même commande `superuser upsert`.
 
-```
-didge.tondomaine.be {
-    reverse_proxy 127.0.0.1:3000
-}
-```
+## RGPD
 
-ou **Nginx** :
-
-```nginx
-server {
-    server_name didge.tondomaine.be;
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
-
-Pour ne pas exposer le port publiquement, remplace dans `docker-compose.yml`
-`"3000:3000"` par `"127.0.0.1:3000:3000"`.
-
-## Mettre à jour
-
-```bash
-git pull            # ou re-copier les fichiers
-docker compose up -d --build
-```
-
-## RGPD (important en Belgique / UE)
-
-- La case de **consentement** est obligatoire dans le formulaire (déjà en place).
-- Recommandé : activer le **double opt-in** dans Brevo (le contact confirme via
-  un e-mail) — meilleure délivrabilité et conformité. Voir Brevo > Contacts >
-  Formulaires, ou l'endpoint DOI de l'API.
-- Prévois une page **politique de confidentialité** et un lien de désinscription
-  (Brevo l'ajoute automatiquement aux campagnes).
-
-## Ce que fait `/api/subscribe`
-
-Valide l'e-mail + le consentement, puis envoie à Brevo :
-
-```json
-{
-  "email": "prenom@exemple.be",
-  "attributes": { "FNAME": "Prénom", "COUNTRY": "Belgique" },
-  "listIds": [<BREVO_LIST_ID>],
-  "updateEnabled": true
-}
-```
-
-`updateEnabled: true` évite l'erreur si le contact existe déjà (il est mis à jour).
-Réponses : `200 {ok:true, whatsapp}` en cas de succès, `400`/`502` sinon.
+- Consentement obligatoire dans le formulaire (en place).
+- Emails des membres jamais exposés par l'API (règles Pocketbase).
+- Désinscription gérée par Brevo dans les campagnes.
+- Recommandé : double opt-in Brevo + page politique de confidentialité.

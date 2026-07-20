@@ -1,0 +1,397 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import AccountNav from '../../components/AccountNav.astro'
+---
+
+<Layout title="Newsletter - Administration">
+  <div
+    class="mx-auto flex min-h-[100dvh] max-w-2xl flex-col px-5 py-10 sm:px-8"
+  >
+    <AccountNav active="newsletter" />
+
+    <section class="py-7">
+      <p
+        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+      >
+        Administration
+      </p>
+      <h1
+        class="balance mt-1.5 text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-stone-900"
+      >
+        Newsletter
+      </h1>
+      <nav class="mt-5 flex gap-6 border-b border-stone-900/10">
+        <a
+          href="/admin"
+          class="-mb-px border-b-2 border-transparent pb-2 text-[13px] font-medium text-stone-400 transition-colors hover:text-stone-600"
+          >Modération</a
+        >
+        <a
+          href="/admin/newsletter"
+          aria-current="page"
+          class="-mb-px border-b-2 border-brand-600 pb-2 text-[13px] font-semibold text-stone-900"
+          >Newsletter</a
+        >
+      </nav>
+    </section>
+
+    <form
+      id="login"
+      hidden
+      class="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5"
+    >
+      <p class="text-[13px] text-stone-500">
+        Connexion administrateur (superuser Pocketbase).
+      </p>
+      <label class="field flex flex-col pb-2">
+        <span
+          class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+          >Identifiant</span
+        >
+        <input
+          id="identity"
+          type="email"
+          autocomplete="username"
+          required
+          class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
+        />
+      </label>
+      <label class="field flex flex-col pb-2">
+        <span
+          class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+          >Mot de passe</span
+        >
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
+        />
+      </label>
+      <button
+        type="submit"
+        class="mt-2 inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2.5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+      >
+        Se connecter
+      </button>
+      <p id="login-error" hidden class="text-[13px] text-red-600"></p>
+    </form>
+
+    <div id="editor" hidden class="flex flex-col gap-6">
+      <div
+        class="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5"
+      >
+        <label class="field flex flex-col pb-2">
+          <span
+            class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+            >Sujet de l'e-mail</span
+          >
+          <input
+            id="subject"
+            type="text"
+            required
+            class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
+            placeholder="Les prochains rendez-vous didgeridoo"
+          />
+        </label>
+        <label class="flex flex-col">
+          <span
+            class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+            >Introduction</span
+          >
+          <textarea
+            id="intro"
+            rows="5"
+            class="mt-1.5 rounded-xl border border-stone-200 bg-stone-50 p-3 text-[15px] leading-relaxed text-stone-900 outline-none focus:border-brand-400"
+            placeholder="Un mot pour la communauté…"></textarea>
+        </label>
+      </div>
+
+      <div
+        class="rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5"
+      >
+        <p
+          class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+        >
+          Événements à insérer
+        </p>
+        <div
+          id="events-state"
+          class="py-6 text-center text-[13px] text-stone-400"
+        >
+          Chargement…
+        </div>
+        <ul id="events" class="mt-2 flex flex-col gap-2"></ul>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          id="preview-btn"
+          type="button"
+          class="inline-flex items-center justify-center rounded-xl bg-stone-900 px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-stone-700 active:translate-y-px"
+        >
+          Aperçu
+        </button>
+        <button
+          id="send-btn"
+          type="button"
+          class="inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-2.5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+        >
+          Envoyer à la liste
+        </button>
+      </div>
+      <p id="feedback" hidden class="text-[14px]"></p>
+
+      <div
+        id="preview-wrap"
+        hidden
+        class="overflow-hidden rounded-2xl border border-stone-200 bg-white"
+      >
+        <div
+          class="border-b border-stone-100 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+        >
+          Aperçu de l'e-mail
+        </div>
+        <iframe
+          id="preview-frame"
+          title="Aperçu de la newsletter"
+          class="h-[600px] w-full border-0"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import {
+      getAdminAuth,
+      setAdminAuth,
+      clearAllAuth,
+      type PbAuth,
+    } from '../../lib/pb'
+
+    const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
+
+    const loginForm = document.getElementById('login') as HTMLFormElement
+    const loginError = document.getElementById(
+      'login-error',
+    ) as HTMLParagraphElement
+    const editor = document.getElementById('editor') as HTMLDivElement
+    const eventsState = document.getElementById(
+      'events-state',
+    ) as HTMLDivElement
+    const eventsList = document.getElementById('events') as HTMLUListElement
+    const previewBtn = document.getElementById(
+      'preview-btn',
+    ) as HTMLButtonElement
+    const sendBtn = document.getElementById('send-btn') as HTMLButtonElement
+    const feedback = document.getElementById('feedback') as HTMLParagraphElement
+    const previewWrap = document.getElementById(
+      'preview-wrap',
+    ) as HTMLDivElement
+    const previewFrame = document.getElementById(
+      'preview-frame',
+    ) as HTMLIFrameElement
+
+    function getToken(): string | null {
+      return getAdminAuth()?.token ?? null
+    }
+
+    function show(authenticated: boolean) {
+      loginForm.hidden = authenticated
+      editor.hidden = !authenticated
+    }
+
+    function fmtDate(value: string): string {
+      const iso = value.replace(' ', 'T') + (value.includes('Z') ? '' : 'Z')
+      const d = new Date(iso)
+      if (Number.isNaN(d.getTime())) return value
+      return new Intl.DateTimeFormat('fr-BE', {
+        dateStyle: 'long',
+        timeStyle: 'short',
+        timeZone: 'Europe/Brussels',
+      }).format(d)
+    }
+
+    interface EventRecord {
+      id: string
+      title: string
+      start: string
+      location: string
+    }
+
+    async function loadEvents() {
+      const token = getToken()
+      if (!token) return
+      try {
+        const filter = encodeURIComponent("(status='published' && start>=@now)")
+        const res = await fetch(
+          `${API_BASE}/pb/api/collections/events/records?perPage=200&filter=${filter}&sort=start`,
+          { headers: { authorization: token } },
+        )
+        if (res.status === 401) return void handleExpired()
+        const json = (await res.json()) as { items: EventRecord[] }
+        eventsState.hidden = true
+        if (!json.items.length) {
+          eventsState.hidden = false
+          eventsState.textContent = 'Aucun événement publié à venir.'
+          return
+        }
+        for (const ev of json.items) {
+          const li = document.createElement('li')
+          li.innerHTML =
+            `<label class="flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200 p-3 transition hover:border-brand-300">` +
+            `<input type="checkbox" value="${ev.id}" class="mt-0.5 h-4 w-4 accent-brand-600" />` +
+            `<span class="min-w-0"><span class="block text-[14px] font-semibold text-stone-900"></span>` +
+            `<span class="mt-0.5 block text-[12.5px] text-stone-500"></span></span></label>`
+          const titleEl = li.querySelector(
+            'label > span > span:first-child',
+          ) as HTMLElement
+          const metaEl = li.querySelector(
+            'label > span > span:last-child',
+          ) as HTMLElement
+          titleEl.textContent = ev.title
+          metaEl.textContent = [fmtDate(ev.start), ev.location]
+            .filter(Boolean)
+            .join(' · ')
+          eventsList.appendChild(li)
+        }
+      } catch {
+        eventsState.hidden = false
+        eventsState.textContent = 'Impossible de charger les événements.'
+      }
+    }
+
+    function handleExpired() {
+      clearAllAuth()
+      show(false)
+      loginError.hidden = false
+      loginError.textContent = 'Session expirée, reconnecte-toi.'
+    }
+
+    function selectedIds(): string[] {
+      return Array.from(
+        eventsList.querySelectorAll<HTMLInputElement>(
+          'input[type=checkbox]:checked',
+        ),
+      ).map((c) => c.value)
+    }
+
+    function payload() {
+      return {
+        subject: (
+          document.getElementById('subject') as HTMLInputElement
+        ).value.trim(),
+        intro: (document.getElementById('intro') as HTMLTextAreaElement).value,
+        eventIds: selectedIds(),
+      }
+    }
+
+    function setFeedback(msg: string, ok: boolean) {
+      feedback.hidden = false
+      feedback.textContent = msg
+      feedback.className = ok
+        ? 'text-[14px] text-brand-700'
+        : 'text-[14px] text-red-600'
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      loginError.hidden = true
+      const identity = (
+        document.getElementById('identity') as HTMLInputElement
+      ).value.trim()
+      const password = (document.getElementById('password') as HTMLInputElement)
+        .value
+      try {
+        const res = await fetch(
+          `${API_BASE}/pb/api/collections/_superusers/auth-with-password`,
+          {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ identity, password }),
+          },
+        )
+        const json = (await res.json()) as PbAuth & { message?: string }
+        if (!res.ok || !json.token) {
+          loginError.hidden = false
+          loginError.textContent = json.message ?? 'Identifiants invalides.'
+          return
+        }
+        setAdminAuth(json)
+        show(true)
+        loadEvents()
+      } catch {
+        loginError.hidden = false
+        loginError.textContent = 'Connexion impossible. Réessaie.'
+      }
+    })
+
+    previewBtn.addEventListener('click', async () => {
+      const token = getToken()
+      if (!token) return
+      feedback.hidden = true
+      previewBtn.disabled = true
+      try {
+        const res = await fetch(`${API_BASE}/api/newsletter/preview`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', authorization: token },
+          body: JSON.stringify(payload()),
+        })
+        if (res.status === 401) return void handleExpired()
+        const html = await res.text()
+        previewFrame.srcdoc = html
+        previewWrap.hidden = false
+        previewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } catch {
+        setFeedback('Aperçu impossible. Réessaie.', false)
+      } finally {
+        previewBtn.disabled = false
+      }
+    })
+
+    sendBtn.addEventListener('click', async () => {
+      const token = getToken()
+      if (!token) return
+      const data = payload()
+      if (!data.subject) {
+        setFeedback('Renseigne un sujet avant l’envoi.', false)
+        return
+      }
+      if (!confirm('Envoyer à la liste Brevo ?')) return
+      feedback.hidden = true
+      sendBtn.disabled = true
+      try {
+        const res = await fetch(`${API_BASE}/api/newsletter/send`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', authorization: token },
+          body: JSON.stringify(data),
+        })
+        if (res.status === 401) return void handleExpired()
+        const json = (await res.json()) as {
+          ok?: boolean
+          error?: string
+          campaignId?: number
+        }
+        if (json.ok) {
+          setFeedback('Newsletter envoyée à la liste Brevo.', true)
+        } else {
+          setFeedback(
+            `Envoi refusé par Brevo : ${json.error ?? 'erreur inconnue'}`,
+            false,
+          )
+        }
+      } catch {
+        setFeedback('Envoi impossible. Réessaie.', false)
+      } finally {
+        sendBtn.disabled = false
+      }
+    })
+
+    if (getToken()) {
+      show(true)
+      loadEvents()
+    } else {
+      show(false)
+    }
+  </script>
+</Layout>

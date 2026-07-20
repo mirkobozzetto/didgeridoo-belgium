@@ -1,0 +1,343 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout
+  title="Calendrier des événements — Didgeridoo Belgique"
+  description="Tous les stages, concerts et rencontres à venir de la communauté belge du didgeridoo."
+>
+  <div class="mx-auto flex min-h-[100dvh] max-w-4xl flex-col px-5 py-4 sm:px-8">
+    <header
+      class="flex items-center justify-between border-b border-stone-900/10 pb-4"
+    >
+      <a href="/" class="text-[13.5px] font-extrabold tracking-[0.08em]">
+        <span class="text-stone-900">didge</span><span class="text-flag-yellow"
+          >ridoo</span
+        ><span class="text-flag-red">.top</span>
+      </a>
+      <nav class="flex items-center gap-4">
+        <a
+          href="/mes-propositions"
+          class="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600 sm:block"
+        >
+          Espace organisateur
+        </a>
+        <a
+          href="/"
+          class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
+        >
+          ← Accueil
+        </a>
+        <a
+          href="/proposer"
+          class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+        >
+          Proposer un événement
+        </a>
+      </nav>
+    </header>
+
+    <section class="py-7 sm:py-9">
+      <p
+        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+      >
+        Agenda
+      </p>
+      <h1
+        class="balance mt-1.5 text-[clamp(2rem,4.5vw,3rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-stone-900"
+      >
+        Les prochains événements
+      </h1>
+      <p class="pretty mt-3 max-w-xl text-[14px] leading-[1.7] text-stone-600">
+        Stages, concerts et rencontres autour du didgeridoo et de la culture
+        aborigène, en Belgique.
+      </p>
+    </section>
+
+    <section id="events" class="min-h-0 flex-1 pb-10">
+      <div id="filters" hidden class="mb-8 flex flex-wrap gap-2">
+        <button type="button" data-cat="all">Tous</button>
+        <button type="button" data-cat="stage">Stage</button>
+        <button type="button" data-cat="concert">Concert</button>
+        <button type="button" data-cat="festival">Festival</button>
+        <button type="button" data-cat="rencontre">Rencontre</button>
+        <button type="button" data-cat="autre">Autre</button>
+      </div>
+
+      <div id="loading" class="py-12 text-center text-[13px] text-stone-400">
+        Chargement des événements…
+      </div>
+
+      <div
+        id="empty"
+        hidden
+        class="rounded-2xl bg-white p-8 text-center ring-1 ring-stone-900/5"
+      >
+        <p class="text-[15px] font-semibold text-stone-900">
+          Aucun événement à venir pour l'instant
+        </p>
+        <p
+          class="pretty mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-stone-500"
+        >
+          Rejoins la communauté sur la page d'accueil pour être prévenu dès
+          qu'un stage ou un concert est annoncé.
+        </p>
+        <a
+          href="/"
+          class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+        >
+          Rejoindre la communauté
+        </a>
+      </div>
+
+      <div
+        id="error"
+        hidden
+        class="rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-center text-[13px] text-red-700"
+      >
+        Impossible de charger les événements. Réessaie dans un instant.
+      </div>
+
+      <div id="list" hidden class="flex flex-col gap-10"></div>
+    </section>
+
+    <footer
+      class="mt-auto flex items-center justify-between border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400"
+    >
+      <span>Didgeridoo &amp; culture aborigène</span>
+      <span
+        >Belgique · <a href="/" class="text-brand-600 hover:text-brand-700"
+          >Accueil</a
+        ></span
+      >
+    </footer>
+  </div>
+
+  <script>
+    type Session = { date: string; start: string; end: string | null }
+
+    type EventRecord = {
+      id: string
+      title: string
+      slug: string
+      start: string
+      end?: string
+      location?: string
+      poster?: string
+      category?: string
+      sessions?: Session[]
+    }
+
+    const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
+
+    const CATEGORIES: Record<string, string> = {
+      stage: 'Stage',
+      concert: 'Concert',
+      festival: 'Festival',
+      rencontre: 'Rencontre',
+      autre: 'Autre',
+    }
+
+    const CHIP_BASE =
+      'rounded-full px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.1em] transition'
+    const CHIP_ON = 'bg-brand-600 text-white'
+    const CHIP_OFF =
+      'bg-white text-stone-500 ring-1 ring-inset ring-stone-900/10 hover:text-brand-700 hover:ring-brand-300'
+
+    const loadingEl = document.getElementById('loading') as HTMLDivElement
+    const emptyEl = document.getElementById('empty') as HTMLDivElement
+    const errorEl = document.getElementById('error') as HTMLDivElement
+    const listEl = document.getElementById('list') as HTMLDivElement
+    const filtersEl = document.getElementById('filters') as HTMLDivElement
+
+    let allEvents: EventRecord[] = []
+
+    const dayFmt = new Intl.DateTimeFormat('fr-BE', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+    const timeFmt = new Intl.DateTimeFormat('fr-BE', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    const monthFmt = new Intl.DateTimeFormat('fr-BE', {
+      month: 'long',
+      year: 'numeric',
+    })
+
+    // Filtre Pocketbase : format UTC "YYYY-MM-DD HH:mm:ss".
+    function nowUtcFilter(): string {
+      return new Date().toISOString().slice(0, 19).replace('T', ' ')
+    }
+
+    // Pocketbase renvoie la date avec un espace, pas un ISO strict.
+    function parseDate(raw: string): Date {
+      return new Date(raw.replace(' ', 'T'))
+    }
+
+    function posterUrl(ev: EventRecord): string | null {
+      if (!ev.poster) return null
+      return `${API_BASE}/pb/api/files/events/${ev.id}/${ev.poster}`
+    }
+
+    function capitalize(s: string): string {
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    }
+
+    function eventCard(ev: EventRecord): HTMLAnchorElement {
+      const a = document.createElement('a')
+      a.href = `/evenements/${ev.slug}`
+      a.className =
+        'group flex gap-4 rounded-2xl bg-white p-3.5 ring-1 ring-stone-900/5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(28_25_23/0.4)] hover:ring-brand-200'
+
+      const thumb = document.createElement('div')
+      thumb.className =
+        'relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-brand-100 ring-1 ring-inset ring-stone-900/5 sm:h-28 sm:w-28'
+      const src = posterUrl(ev)
+      if (src) {
+        const img = document.createElement('img')
+        img.src = src
+        img.alt = `Affiche : ${ev.title}`
+        img.loading = 'lazy'
+        img.className = 'h-full w-full object-cover'
+        thumb.appendChild(img)
+      } else {
+        thumb.innerHTML =
+          '<span class="flex h-full w-full items-center justify-center text-2xl">🪘</span>'
+      }
+
+      const body = document.createElement('div')
+      body.className = 'flex min-w-0 flex-col justify-center py-1'
+
+      const start = parseDate(ev.start)
+      const dateLine = document.createElement('p')
+      dateLine.className =
+        'text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-600'
+      dateLine.textContent = `${capitalize(dayFmt.format(start))} · ${timeFmt.format(start)}`
+
+      body.appendChild(dateLine)
+
+      const extra =
+        Array.isArray(ev.sessions) && ev.sessions.length > 1
+          ? ev.sessions.length - 1
+          : 0
+      if (extra > 0) {
+        const more = document.createElement('p')
+        more.className = 'mt-0.5 text-[12px] text-stone-400'
+        more.textContent = `+${extra} autre${extra > 1 ? 's' : ''} date${extra > 1 ? 's' : ''}`
+        body.appendChild(more)
+      }
+
+      const title = document.createElement('h2')
+      title.className =
+        'mt-1 truncate text-[16px] font-bold leading-snug tracking-tight text-stone-900'
+      title.textContent = ev.title
+
+      body.appendChild(title)
+
+      if (ev.category && CATEGORIES[ev.category]) {
+        const badge = document.createElement('span')
+        badge.className =
+          'mt-1.5 inline-flex w-fit rounded-full bg-stone-100 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-stone-500'
+        badge.textContent = CATEGORIES[ev.category]
+        body.appendChild(badge)
+      }
+
+      if (ev.location) {
+        const loc = document.createElement('p')
+        loc.className = 'mt-0.5 truncate text-[13px] text-stone-500'
+        loc.textContent = ev.location
+        body.appendChild(loc)
+      }
+
+      a.append(thumb, body)
+      return a
+    }
+
+    function renderList(events: EventRecord[]) {
+      listEl.replaceChildren()
+
+      if (events.length === 0) {
+        const msg = document.createElement('p')
+        msg.className = 'py-10 text-center text-[13px] text-stone-400'
+        msg.textContent = 'Aucun événement dans cette catégorie.'
+        listEl.appendChild(msg)
+        listEl.hidden = false
+        return
+      }
+
+      const groups = new Map<string, { label: string; items: EventRecord[] }>()
+      for (const ev of events) {
+        const d = parseDate(ev.start)
+        const key = `${d.getFullYear()}-${d.getMonth()}`
+        if (!groups.has(key))
+          groups.set(key, { label: capitalize(monthFmt.format(d)), items: [] })
+        groups.get(key)!.items.push(ev)
+      }
+
+      for (const { label, items } of groups.values()) {
+        const section = document.createElement('div')
+        const heading = document.createElement('h2')
+        heading.className =
+          'mb-4 border-b border-stone-900/10 pb-2 text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-400'
+        heading.textContent = label
+        section.appendChild(heading)
+
+        const cards = document.createElement('div')
+        cards.className = 'flex flex-col gap-3'
+        for (const ev of items) cards.appendChild(eventCard(ev))
+        section.appendChild(cards)
+        listEl.appendChild(section)
+      }
+      listEl.hidden = false
+    }
+
+    function applyFilter(cat: string) {
+      for (const chip of Array.from(filtersEl.querySelectorAll('button'))) {
+        const on = chip.dataset.cat === cat
+        chip.className = `${CHIP_BASE} ${on ? CHIP_ON : CHIP_OFF}`
+      }
+      renderList(
+        cat === 'all'
+          ? allEvents
+          : allEvents.filter((ev) => ev.category === cat),
+      )
+    }
+
+    function render(events: EventRecord[]) {
+      loadingEl.hidden = true
+      if (events.length === 0) {
+        emptyEl.hidden = false
+        return
+      }
+
+      allEvents = events
+      filtersEl.hidden = false
+      for (const chip of Array.from(filtersEl.querySelectorAll('button'))) {
+        chip.addEventListener('click', () =>
+          applyFilter(chip.dataset.cat ?? 'all'),
+        )
+      }
+      applyFilter('all')
+    }
+
+    async function load() {
+      const filter = encodeURIComponent(
+        `(status='published' && start >= '${nowUtcFilter()}')`,
+      )
+      const url = `${API_BASE}/pb/api/collections/events/records?filter=${filter}&sort=start&perPage=200`
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const json = await res.json()
+        render((json.items ?? []) as EventRecord[])
+      } catch {
+        loadingEl.hidden = true
+        errorEl.hidden = false
+      }
+    }
+
+    load()
+  </script>
+</Layout>
