@@ -474,9 +474,18 @@ import AccountNav from '../components/AccountNav.astro'
         sel?.addRange(savedRange)
       }
       if (savedRange && savedRange.collapsed) {
-        document.execCommand('insertHTML', false, `<a href="${url}">${url}</a>`)
+        const a = document.createElement('a')
+        a.href = url
+        a.textContent = url
+        savedRange.insertNode(a)
+        const sel = window.getSelection()
+        const after = document.createRange()
+        after.setStartAfter(a)
+        after.collapse(true)
+        sel?.removeAllRanges()
+        sel?.addRange(after)
       } else {
-        document.execCommand('createLink', false, url)
+        exec('createLink', url)
       }
       closeLinkRow()
     })
