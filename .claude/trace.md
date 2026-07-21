@@ -14,3 +14,4 @@ Newest entries at the bottom. `next` reads this to show what moved.
 - [web] 2026-07-20T12:45:12Z | done: edited 1 file | files: web/.claude/ | status: wip
 - [Makefile] 2026-07-20T14:02:37Z | done: edited 9 files | files: Makefile, web/package.json, web/src/env.d.ts, web/src/layouts/Layout.astro, web/src/styles/global.css, web/tsconfig.json, .prettierrc, server/.prettierrc, +1 more | status: wip
 - [chat] 2026-07-20T18:46:55Z | done: edited 1 file | files: README.md | status: wip
+- [chat] 2026-07-20T19:47:08Z | done: edited 1 file | files: AGENTS.md | status: wip
