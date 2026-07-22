@@ -1,0 +1,30 @@
+---
+interface Props {
+  active: 'moderation' | 'newsletter'
+}
+const { active } = Astro.props
+
+const tabs = [
+  { key: 'moderation', href: '/admin', label: 'Modération' },
+  { key: 'newsletter', href: '/admin/newsletter', label: 'Newsletter' },
+] as const
+
+const activeClass =
+  '-mb-px border-b-2 border-brand-600 pb-2 text-[13px] font-semibold text-stone-900'
+const idleClass =
+  '-mb-px border-b-2 border-transparent pb-2 text-[13px] font-medium text-stone-400 transition-colors hover:text-stone-600'
+---
+
+<nav class="mt-5 flex gap-6 border-b border-stone-900/10">
+  {
+    tabs.map((tab) => (
+      <a
+        href={tab.href}
+        aria-current={tab.key === active ? 'page' : undefined}
+        class={tab.key === active ? activeClass : idleClass}
+      >
+        {tab.label}
+      </a>
+    ))
+  }
+</nav>

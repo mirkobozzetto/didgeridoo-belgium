@@ -1,0 +1,12 @@
+---
+interface Props {
+  class?: string
+}
+const { class: className = 'text-[13.5px]' } = Astro.props
+---
+
+<a href="/" class={`shrink-0 font-extrabold tracking-[0.08em] ${className}`}>
+  <span class="text-stone-900">didge</span><span class="text-flag-yellow"
+    >ridoo</span
+  ><span class="text-flag-red">.top</span>
+</a>

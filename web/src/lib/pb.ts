@@ -1,7 +1,7 @@
 const BASE = `${(import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')}/pb`
 
-const AUTH_KEY = 'pb_auth'
-const ADMIN_AUTH_KEY = 'pb_admin_auth'
+export const AUTH_KEY = 'pb_auth'
+export const ADMIN_AUTH_KEY = 'pb_admin_auth'
 
 export interface PbAuth {
   token: string

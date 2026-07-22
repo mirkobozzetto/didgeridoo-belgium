@@ -1,12 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
 import AccountNav from '../components/AccountNav.astro'
 ---
 
 <Layout title="Proposer un événement — Didgeridoo Belgique">
-  <div
-    class="mx-auto flex min-h-[100dvh] max-w-2xl flex-col px-5 py-10 sm:px-8"
-  >
+  <PageShell width="2xl">
     <AccountNav active="proposer" />
 
     <section class="py-7">
@@ -348,7 +347,7 @@ import AccountNav from '../components/AccountNav.astro'
         <calendar-month></calendar-month>
       </calendar-date>
     </div>
-  </div>
+  </PageShell>
 
   <script>
     import 'cally'

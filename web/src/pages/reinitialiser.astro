@@ -1,17 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
+import Brand from '../components/Brand.astro'
 ---
 
 <Layout title="Nouveau mot de passe — Didgeridoo Belgique">
-  <div
-    class="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-5 py-10 sm:px-8"
-  >
+  <PageShell width="md" center>
     <header class="pb-6 text-center">
-      <a href="/" class="text-[13.5px] font-extrabold tracking-[0.08em]">
-        <span class="text-stone-900">didge</span><span class="text-flag-yellow"
-          >ridoo</span
-        ><span class="text-flag-red">.top</span>
-      </a>
+      <Brand />
     </header>
 
     <div
@@ -78,7 +74,7 @@ import Layout from '../layouts/Layout.astro'
       <a href="/connexion" class="hover:text-stone-600">Retour à la connexion</a
       >
     </p>
-  </div>
+  </PageShell>
 
   <script>
     import { pb } from '../lib/pb'

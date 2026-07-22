@@ -1,0 +1,48 @@
+---
+// Form de connexion superuser partagé par les pages admin.
+// Les ids (login, identity, password, login-error) sont le contrat
+// qu'utilisent les scripts métier des pages.
+---
+
+<form
+  id="login"
+  hidden
+  class="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5"
+>
+  <p class="text-[13px] text-stone-500">
+    Connexion administrateur (superuser Pocketbase).
+  </p>
+  <label class="field flex flex-col pb-2">
+    <span
+      class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+      >Identifiant</span
+    >
+    <input
+      id="identity"
+      type="email"
+      autocomplete="username"
+      required
+      class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
+    />
+  </label>
+  <label class="field flex flex-col pb-2">
+    <span
+      class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+      >Mot de passe</span
+    >
+    <input
+      id="password"
+      type="password"
+      autocomplete="current-password"
+      required
+      class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
+    />
+  </label>
+  <button
+    type="submit"
+    class="mt-2 inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2.5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+  >
+    Se connecter
+  </button>
+  <p id="login-error" hidden class="text-[13px] text-red-600"></p>
+</form>

@@ -1,12 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
 import AccountNav from '../components/AccountNav.astro'
 ---
 
 <Layout title="Mes propositions — Didgeridoo Belgique">
-  <div
-    class="mx-auto flex min-h-[100dvh] max-w-2xl flex-col px-5 py-10 sm:px-8"
-  >
+  <PageShell width="2xl">
     <AccountNav active="mes-propositions" />
 
     <section class="flex flex-wrap items-end justify-between gap-4 py-7">
@@ -47,7 +46,7 @@ import AccountNav from '../components/AccountNav.astro'
       </p>
     </div>
     <ul id="list" class="flex flex-col gap-4"></ul>
-  </div>
+  </PageShell>
 
   <template id="card-tpl">
     <li
