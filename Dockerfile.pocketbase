@@ -6,6 +6,11 @@ RUN apk add --no-cache ca-certificates unzip \
  && wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${TARGETARCH}.zip" -O /tmp/pb.zip \
  && unzip /tmp/pb.zip -d /pb && rm /tmp/pb.zip
 
+# Versionnés dans le repo : dans l'image plutôt qu'en bind mount,
+# sinon le re-clone Dokploy les efface. Le compose.dev les bind-mounte par-dessus.
+COPY pb_migrations /pb/pb_migrations
+COPY pb_hooks /pb/pb_hooks
+
 EXPOSE 8090
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
   CMD wget -q -O /dev/null http://localhost:8090/api/health || exit 1

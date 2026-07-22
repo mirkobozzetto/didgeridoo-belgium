@@ -15,3 +15,6 @@ Newest entries at the bottom. `next` reads this to show what moved.
 - [Makefile] 2026-07-20T14:02:37Z | done: edited 9 files | files: Makefile, web/package.json, web/src/env.d.ts, web/src/layouts/Layout.astro, web/src/styles/global.css, web/tsconfig.json, .prettierrc, server/.prettierrc, +1 more | status: wip
 - [chat] 2026-07-20T18:46:55Z | done: edited 1 file | files: README.md | status: wip
 - [chat] 2026-07-20T19:47:08Z | done: edited 1 file | files: AGENTS.md | status: wip
+- [chat] 2026-07-22T13:38:09Z | done: edited 4 files | files: .dockerignore, Dockerfile.pocketbase, docker-compose.yml, docker-compose.local.yml | status: wip
+- [chat] 2026-07-22T13:39:49Z | done: edited 2 files | files: AGENTS.md, CLAUDE.md | status: wip
+- [web] 2026-07-22T13:50:04Z | done: edited 1 file | files: web/src/pages/index.astro | status: wip

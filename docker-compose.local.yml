@@ -1,0 +1,6 @@
+# Overlay pour tester la stack prod en local (Dokploy n'utilise que docker-compose.yml).
+# Usage : docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
+services:
+  app:
+    ports:
+      - "3000:3000"
