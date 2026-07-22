@@ -5,10 +5,8 @@ services:
       dockerfile: Dockerfile
     image: didge-belgique:latest
     restart: unless-stopped
-    ports:
-      # Expose en local sur 3000. Derrière ton reverse proxy (Nginx/Caddy/Traefik),
-      # tu peux mapper "127.0.0.1:3000:3000" pour ne pas exposer directement.
-      - "3000:3000"
+    # Pas de port publié : Dokploy route via Traefik (Domains -> serviceName: app, port 3000).
+    # Test local : docker compose -f docker-compose.yml -f docker-compose.local.yml up
     environment:
       BREVO_API_KEY: ${BREVO_API_KEY}
       BREVO_LIST_ID: ${BREVO_LIST_ID}
@@ -31,20 +29,20 @@ services:
       # Admin UI (/_/) : accès via tunnel SSH uniquement, jamais exposé au public.
       - "127.0.0.1:8090:8090"
     volumes:
-      - ./pb_data:/pb/pb_data
-      - ./pb_migrations:/pb/pb_migrations
-      - ./pb_hooks:/pb/pb_hooks
+      # Volume nommé obligatoire : Dokploy re-clone le repo à chaque deploy,
+      # un bind mount relatif (./pb_data) serait effacé. Migrations/hooks sont
+      # dans l'image (COPY, versionnés) ; en dev le compose.dev les bind-mounte.
+      - pb_data:/pb/pb_data
 
   pb-backup:
     image: alpine:3.21
     restart: unless-stopped
     volumes:
-      - ./pb_data:/pb_data:ro
-      - ./backups:/backups
+      - pb_data:/pb_data:ro
+      - pb_backups:/backups
     # tar quotidien de pb_data, rétention 14 jours
-    command: >
-      sh -c 'while true; do
-        tar czf /backups/pb_data-$$(date +%F).tar.gz -C / pb_data
-        && find /backups -name "pb_data-*.tar.gz" -mtime +14 -delete;
-        sleep 86400;
-      done'
+    command: sh -c 'while true; do tar czf /backups/pb_data-$$(date +%F).tar.gz -C / pb_data && find /backups -name "pb_data-*.tar.gz" -mtime +14 -delete; sleep 86400; done'
+
+volumes:
+  pb_data:
+  pb_backups:

@@ -4,3 +4,5 @@
 .git
 .env
 *.log
+pb_data
+backups
