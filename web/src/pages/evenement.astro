@@ -1,33 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import Brand from '../components/Brand.astro'
+import PageShell from '../layouts/PageShell.astro'
 ---
 
 <Layout
   title="Événement — Didgeridoo Belgique"
   description="Stage, concert ou rencontre de la communauté belge du didgeridoo."
 >
-  <div class="mx-auto flex min-h-[100dvh] max-w-3xl flex-col px-5 py-4 sm:px-8">
-    <header
-      class="flex items-center justify-between border-b border-stone-900/10 pb-4"
-    >
-      <Brand />
-      <nav class="flex items-center gap-4">
-        <a
-          href="/calendrier"
-          class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
-        >
-          ← Calendrier
-        </a>
-        <a
-          href="/proposer"
-          class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
-        >
-          Proposer un événement
-        </a>
-      </nav>
-    </header>
-
+  <PageShell width="3xl" nav>
     <main class="min-h-0 flex-1 py-7 sm:py-9">
       <div id="loading" class="py-12 text-center text-[13px] text-stone-400">
         Chargement…
@@ -188,7 +168,7 @@ import Brand from '../components/Brand.astro'
         ></span
       >
     </footer>
-  </div>
+  </PageShell>
 
   <script>
     type Session = { date: string; start: string; end: string | null }

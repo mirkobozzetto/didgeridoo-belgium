@@ -1,15 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import PageShell from '../../layouts/PageShell.astro'
-import AccountNav from '../../components/AccountNav.astro'
 import AdminHeader from '../../components/admin/AdminHeader.astro'
 import AdminLoginForm from '../../components/AdminLoginForm.astro'
 import NewsletterEditor from '../../components/admin/NewsletterEditor.astro'
 ---
 
 <Layout title="Newsletter - Administration">
-  <PageShell width="2xl">
-    <AccountNav active="newsletter" />
+  <PageShell width="3xl" nav active="newsletter">
     <AdminHeader title="Newsletter" active="newsletter" />
     <AdminLoginForm />
     <NewsletterEditor />

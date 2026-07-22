@@ -1,39 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import Brand from '../components/Brand.astro'
+import PageShell from '../layouts/PageShell.astro'
 ---
 
 <Layout
   title="Calendrier des événements — Didgeridoo Belgique"
   description="Tous les stages, concerts et rencontres à venir de la communauté belge du didgeridoo."
 >
-  <div class="mx-auto flex min-h-[100dvh] max-w-4xl flex-col px-5 py-4 sm:px-8">
-    <header
-      class="flex items-center justify-between border-b border-stone-900/10 pb-4"
-    >
-      <Brand />
-      <nav class="flex items-center gap-4">
-        <a
-          href="/mes-propositions"
-          class="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600 sm:block"
-        >
-          Espace organisateur
-        </a>
-        <a
-          href="/"
-          class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
-        >
-          ← Accueil
-        </a>
-        <a
-          href="/proposer"
-          class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
-        >
-          Proposer un événement
-        </a>
-      </nav>
-    </header>
-
+  <PageShell width="4xl" nav active="calendrier">
     <section class="py-7 sm:py-9">
       <p
         class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
@@ -108,7 +82,7 @@ import Brand from '../components/Brand.astro'
         ></span
       >
     </footer>
-  </div>
+  </PageShell>
 
   <script>
     type Session = { date: string; start: string; end: string | null }

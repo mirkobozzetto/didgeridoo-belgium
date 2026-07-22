@@ -1,9 +1,14 @@
 ---
+import AccountNav from '../components/AccountNav.astro'
+
 interface Props {
   width: 'md' | '2xl' | '3xl' | '4xl' | '7xl'
   center?: boolean
+  nav?: boolean
+  active?:
+    'calendrier' | 'proposer' | 'mes-propositions' | 'admin' | 'newsletter'
 }
-const { width, center = false } = Astro.props
+const { width, center = false, nav = false, active } = Astro.props
 
 // Classes complètes en littéral : Tailwind ne compile pas les noms dynamiques.
 const widths = {
@@ -15,12 +20,22 @@ const widths = {
 }
 ---
 
-<div
-  class:list={[
-    'mx-auto flex min-h-[100dvh] flex-col px-5 py-10 sm:px-8',
-    widths[width],
-    center && 'justify-center',
-  ]}
->
-  <slot />
+<div class="flex min-h-[100dvh] flex-col">
+  {
+    nav && (
+      <div class="mx-auto w-full max-w-5xl px-5 pt-10 sm:px-8">
+        <AccountNav active={active} />
+      </div>
+    )
+  }
+  <div
+    class:list={[
+      'mx-auto flex w-full flex-1 flex-col px-5 sm:px-8',
+      nav ? 'pb-10' : 'py-10',
+      widths[width],
+      center && 'justify-center',
+    ]}
+  >
+    <slot />
+  </div>
 </div>

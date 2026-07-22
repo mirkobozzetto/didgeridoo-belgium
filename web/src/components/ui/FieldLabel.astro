@@ -1,0 +1,22 @@
+---
+interface Props {
+  size?: 'sm' | 'md'
+  required?: boolean
+  hint?: string
+  block?: boolean
+}
+const { size = 'sm', required = false, hint, block = false } = Astro.props
+
+const sizes = {
+  sm: 'text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400',
+  md: 'text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400',
+}
+---
+
+<span class:list={[block && 'block', sizes[size]]}
+  ><slot />{required && <span class="text-brand-500"> *</span>}{
+    hint && (
+      <span class="normal-case tracking-normal text-stone-300"> ({hint})</span>
+    )
+  }</span
+>

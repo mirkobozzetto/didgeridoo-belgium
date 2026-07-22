@@ -1,0 +1,180 @@
+---
+import FieldLabel from '../ui/FieldLabel.astro'
+---
+
+<div class="block pb-2">
+  <FieldLabel block required>Description</FieldLabel>
+  <div
+    class="mt-1.5 overflow-hidden rounded-xl border border-stone-200 transition-colors focus-within:border-brand-600"
+  >
+    <div
+      role="toolbar"
+      aria-label="Mise en forme"
+      class="flex flex-wrap items-center gap-0.5 border-b border-stone-200 bg-stone-50 px-2 py-1.5"
+    >
+      <button type="button" data-cmd="bold" class="rte-btn font-bold"
+        >Gras</button
+      >
+      <button type="button" data-cmd="italic" class="rte-btn italic"
+        >Italique</button
+      >
+      <button type="button" data-cmd="insertUnorderedList" class="rte-btn"
+        >Liste</button
+      >
+      <button type="button" data-link class="rte-btn">Lien</button>
+      <button type="button" data-cmd="removeFormat" class="rte-btn"
+        >Effacer le format</button
+      >
+    </div>
+    <div
+      id="link-row"
+      hidden
+      class="flex items-center gap-2 border-b border-stone-200 bg-white px-2.5 py-2"
+    >
+      <input
+        id="link-url"
+        type="url"
+        placeholder="https://..."
+        class="min-w-0 flex-1 bg-transparent text-[13px] text-stone-900 placeholder-stone-300 focus:outline-none"
+      />
+      <button
+        type="button"
+        id="link-apply"
+        class="shrink-0 rounded-lg bg-brand-100 px-3 py-1 text-[12px] font-semibold text-brand-700 transition hover:bg-brand-200"
+        >Ajouter</button
+      >
+      <button
+        type="button"
+        id="link-cancel"
+        class="shrink-0 rounded-lg px-2 py-1 text-[12px] font-medium text-stone-400 transition hover:text-stone-600"
+        >Annuler</button
+      >
+    </div>
+    <div
+      id="description-editor"
+      contenteditable="true"
+      role="textbox"
+      aria-multiline="true"
+      data-placeholder="Programme, ambiance, public visé, ce qu'il faut apporter..."
+      class="rte-editor min-h-32 w-full bg-white px-3.5 py-3 text-[15px] leading-relaxed text-stone-900 focus:outline-none"
+    >
+    </div>
+  </div>
+</div>
+
+<script>
+  const editor = document.getElementById('description-editor') as HTMLDivElement
+  const linkRow = document.getElementById('link-row') as HTMLDivElement
+  const linkUrl = document.getElementById('link-url') as HTMLInputElement
+  const linkApply = document.getElementById('link-apply') as HTMLButtonElement
+  const linkCancel = document.getElementById('link-cancel') as HTMLButtonElement
+  const linkToggle = document.querySelector('[data-link]') as HTMLButtonElement
+
+  let savedRange: Range | null = null
+
+  document.execCommand('defaultParagraphSeparator', false, 'p')
+
+  function exec(cmd: string, value?: string) {
+    // sans focus préalable, execCommand (Liste notamment) ne fait rien
+    if (!editor.contains(document.getSelection()?.anchorNode ?? null)) {
+      editor.focus()
+    }
+    document.execCommand(cmd, false, value)
+    editor.focus()
+  }
+
+  for (const btn of Array.from(
+    document.querySelectorAll<HTMLButtonElement>('.rte-btn'),
+  )) {
+    btn.addEventListener('mousedown', (e) => e.preventDefault())
+  }
+
+  for (const btn of Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-cmd]'),
+  )) {
+    btn.addEventListener('click', () => exec(btn.dataset.cmd as string))
+  }
+
+  function closeLinkRow() {
+    linkRow.hidden = true
+    linkUrl.value = ''
+    savedRange = null
+  }
+
+  linkToggle.addEventListener('click', () => {
+    const sel = window.getSelection()
+    savedRange = sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null
+    linkRow.hidden = false
+    linkUrl.focus()
+  })
+
+  linkApply.addEventListener('click', () => {
+    const url = linkUrl.value.trim()
+    if (!/^https?:\/\//i.test(url)) {
+      linkUrl.focus()
+      return
+    }
+    editor.focus()
+    if (savedRange) {
+      const sel = window.getSelection()
+      sel?.removeAllRanges()
+      sel?.addRange(savedRange)
+    }
+    if (savedRange && savedRange.collapsed) {
+      const a = document.createElement('a')
+      a.href = url
+      a.textContent = url
+      savedRange.insertNode(a)
+      const sel = window.getSelection()
+      const after = document.createRange()
+      after.setStartAfter(a)
+      after.collapse(true)
+      sel?.removeAllRanges()
+      sel?.addRange(after)
+    } else {
+      exec('createLink', url)
+    }
+    closeLinkRow()
+  })
+
+  linkCancel.addEventListener('click', closeLinkRow)
+</script>
+
+<!-- is:global : le contenu de l'éditeur (ul, li, a, p) est créé à
+     l'exécution par execCommand, un style scopé Astro ne le matcherait pas. -->
+<style is:global>
+  .rte-btn {
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 12px;
+    color: rgb(87 83 78);
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+  }
+  .rte-btn:hover {
+    background-color: rgb(231 229 228);
+    color: rgb(28 25 23);
+  }
+
+  .rte-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #d6d3d1;
+    pointer-events: none;
+  }
+  .rte-editor ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .rte-editor ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+  .rte-editor a {
+    color: var(--color-brand-600);
+    text-decoration: underline;
+  }
+  .rte-editor p {
+    margin: 0 0 0.5rem;
+  }
+</style>

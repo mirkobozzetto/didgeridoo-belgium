@@ -1,15 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import PageShell from '../../layouts/PageShell.astro'
-import AccountNav from '../../components/AccountNav.astro'
 import AdminHeader from '../../components/admin/AdminHeader.astro'
 import AdminLoginForm from '../../components/AdminLoginForm.astro'
 import ModerationBoard from '../../components/admin/ModerationBoard.astro'
 ---
 
 <Layout title="Modération - Administration">
-  <PageShell width="3xl">
-    <AccountNav active="admin" />
+  <PageShell width="3xl" nav active="admin">
     <AdminHeader title="Modération" active="moderation" />
     <AdminLoginForm />
     <ModerationBoard />
