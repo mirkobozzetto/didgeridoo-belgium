@@ -9,3 +9,7 @@ generated-images/
 .DS_Store
 pb_data/
 backups/
+
+# Interne, pas sur le repo public
+.claude/
+docs/
