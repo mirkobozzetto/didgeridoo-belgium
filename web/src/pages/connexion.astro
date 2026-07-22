@@ -99,6 +99,13 @@ import Layout from '../layouts/Layout.astro'
         >
         </div>
 
+        <div
+          id="notice"
+          hidden
+          class="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-[13px] text-stone-700"
+        >
+        </div>
+
         <button
           type="submit"
           class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
@@ -116,6 +123,14 @@ import Layout from '../layouts/Layout.astro'
           >Créer un compte</button
         >
       </p>
+      <p class="mt-2 text-center text-[12.5px] text-stone-400">
+        <button
+          id="forgot"
+          type="button"
+          class="hover:text-stone-600 underline underline-offset-2"
+          >Mot de passe oublié&nbsp;?</button
+        >
+      </p>
     </div>
 
     <p class="mt-6 text-center text-[11.5px] text-stone-400">
@@ -124,20 +139,15 @@ import Layout from '../layouts/Layout.astro'
   </div>
 
   <script>
-    import {
-      pb,
-      setAuth,
-      getAuth,
-      isAdmin,
-      loginBoth,
-      type PbAuth,
-    } from '../lib/pb'
+    import { pb, getAuth, isAdmin, loginBoth } from '../lib/pb'
 
     if (getAuth()) location.replace('/mes-propositions')
     else if (isAdmin()) location.replace('/admin')
 
     const form = document.getElementById('auth-form') as HTMLFormElement
     const errorEl = document.getElementById('error') as HTMLDivElement
+    const noticeEl = document.getElementById('notice') as HTMLDivElement
+    const forgot = document.getElementById('forgot') as HTMLButtonElement
     const nameField = document.getElementById('name-field') as HTMLLabelElement
     const nameInput = nameField.querySelector('input') as HTMLInputElement
     const passwordInput = form.querySelector(
@@ -180,7 +190,33 @@ import Layout from '../layouts/Layout.astro'
     function showError(msg: string) {
       errorEl.hidden = false
       errorEl.textContent = msg
+      noticeEl.hidden = true
     }
+
+    function showNotice(msg: string) {
+      noticeEl.hidden = false
+      noticeEl.textContent = msg
+      errorEl.hidden = true
+    }
+
+    forgot.addEventListener('click', async () => {
+      const email = String(new FormData(form).get('email') ?? '').trim()
+      if (!email) {
+        showError("Renseigne d'abord ton e-mail, puis reclique.")
+        return
+      }
+      try {
+        await pb('/api/collections/users/request-password-reset', {
+          method: 'POST',
+          body: { email },
+        })
+      } catch {
+        // Réponse identique que le compte existe ou non : rien à divulguer.
+      }
+      showNotice(
+        'Si un compte existe pour cet e-mail, un lien de réinitialisation vient de partir. Vérifie ta boîte.',
+      )
+    })
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
@@ -214,24 +250,24 @@ import Layout from '../layouts/Layout.astro'
               name: name || email.split('@')[0],
             },
           })
-        }
-
-        if (mode === 'signup') {
-          const auth = await pb<PbAuth>(
-            '/api/collections/users/auth-with-password',
-            {
-              method: 'POST',
-              body: { identity: email, password },
-            },
+          await pb('/api/collections/users/request-verification', {
+            method: 'POST',
+            body: { email },
+          })
+          form.reset()
+          mode = 'login'
+          applyMode()
+          showNotice(
+            'Compte créé. Un e-mail de confirmation vient de partir : clique sur le lien pour activer ton compte, puis connecte-toi.',
           )
-          setAuth(auth)
-          location.replace('/mes-propositions')
           return
         }
 
         const { organizer, admin } = await loginBoth(email, password)
         if (!organizer && !admin) {
-          showError('Identifiants invalides.')
+          showError(
+            'Identifiants invalides, ou compte pas encore activé (vérifie ta boîte mail, pense au spam).',
+          )
           return
         }
         location.replace(organizer ? '/mes-propositions' : '/admin')

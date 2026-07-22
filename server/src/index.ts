@@ -104,6 +104,10 @@ app.route('/api/newsletter', newsletter)
 // ---------------------------------------------------------------------------
 app.all('/pb/*', async (c) => {
   const url = new URL(c.req.url)
+  // L'UI d'admin Pocketbase (/_/) reste privée : accès via tunnel SSH uniquement.
+  if (/^\/pb\/_(\/|$)/.test(url.pathname)) {
+    return c.json({ ok: false, error: 'not_found' }, 404)
+  }
   const target = POCKETBASE_URL + url.pathname.replace(/^\/pb/, '') + url.search
   const headers = new Headers(c.req.raw.headers)
   headers.delete('host')
