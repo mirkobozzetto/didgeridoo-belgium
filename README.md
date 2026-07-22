@@ -131,12 +131,16 @@ git config core.hooksPath .githooks
 
 ## Deployment
 
-Everything operational (Dokploy setup, DNS, backups, admin creation,
-incident recovery) lives in [`docs/operations.md`](docs/operations.md).
-
-Short version: pushing to the `development` branch auto-deploys to
-production through Dokploy. Data lives in named Docker volumes
+Pushing to the `development` branch auto-deploys to production through
+Dokploy (Traefik + Let's Encrypt). Data lives in named Docker volumes
 (`pb_data`, `pb_backups`) and survives every redeploy.
+
+Backups run on two layers: a daily local tar of `pb_data` (14-day
+retention) and a nightly PocketBase backup pushed to an S3-compatible
+offsite bucket (configured in the PocketBase admin, Settings > Backups).
+
+The detailed operations guide (server access, DNS, incident recovery)
+is kept outside this public repository.
 
 ## GDPR
 
