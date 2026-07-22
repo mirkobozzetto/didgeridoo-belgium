@@ -67,40 +67,45 @@ const menuItem =
 <script>
   import { clearAllAuth } from '../lib/pb'
 
-  const root = document.querySelector('[data-account-nav]') as HTMLElement
-  const trigger = root.querySelector('[data-menu-trigger]') as HTMLButtonElement
-  const menu = root.querySelector('[data-menu]') as HTMLElement
+  // Astro bundle ce script même quand PageShell ne rend pas la nav :
+  // sans garde, le crash bloque tous les autres scripts de la page.
+  const root = document.querySelector<HTMLElement>('[data-account-nav]')
+  if (root) {
+    const trigger = root.querySelector(
+      '[data-menu-trigger]',
+    ) as HTMLButtonElement
+    const menu = root.querySelector('[data-menu]') as HTMLElement
 
-  const activeKey = root.dataset.active
-  const current = menu.querySelector<HTMLElement>(
-    `[data-menu-key="${activeKey}"]`,
-  )
-  if (current) {
-    current.classList.remove('text-stone-600')
-    current.classList.add('text-stone-900', 'font-semibold')
-    current.setAttribute('aria-current', 'page')
-  }
+    const activeKey = root.dataset.active
+    const current = menu.querySelector<HTMLElement>(
+      `[data-menu-key="${activeKey}"]`,
+    )
+    if (current) {
+      current.classList.remove('text-stone-600')
+      current.classList.add('text-stone-900', 'font-semibold')
+      current.setAttribute('aria-current', 'page')
+    }
 
-  const close = () => {
-    menu.hidden = true
-    trigger.setAttribute('aria-expanded', 'false')
-  }
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation()
-    menu.hidden = !menu.hidden
-    trigger.setAttribute('aria-expanded', String(!menu.hidden))
-  })
-  document.addEventListener('click', (e) => {
-    if (!menu.hidden && !menu.contains(e.target as Node)) close()
-  })
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') close()
-  })
-  ;(root.querySelector('[data-logout]') as HTMLButtonElement).addEventListener(
-    'click',
-    () => {
+    const close = () => {
+      menu.hidden = true
+      trigger.setAttribute('aria-expanded', 'false')
+    }
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation()
+      menu.hidden = !menu.hidden
+      trigger.setAttribute('aria-expanded', String(!menu.hidden))
+    })
+    document.addEventListener('click', (e) => {
+      if (!menu.hidden && !menu.contains(e.target as Node)) close()
+    })
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close()
+    })
+    ;(
+      root.querySelector('[data-logout]') as HTMLButtonElement
+    ).addEventListener('click', () => {
       clearAllAuth()
       location.href = '/'
-    },
-  )
+    })
+  }
 </script>
