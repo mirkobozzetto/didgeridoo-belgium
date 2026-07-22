@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="Vérification de l'e-mail — Didgeridoo Belgique">
+  <div
+    class="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-5 py-10 sm:px-8"
+  >
+    <header class="pb-6 text-center">
+      <a href="/" class="text-[13.5px] font-extrabold tracking-[0.08em]">
+        <span class="text-stone-900">didge</span><span class="text-flag-yellow"
+          >ridoo</span
+        ><span class="text-flag-red">.top</span>
+      </a>
+    </header>
+
+    <div
+      class="relative overflow-hidden rounded-2xl bg-white p-6 text-center shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5"
+    >
+      <span
+        class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+      ></span>
+
+      <p
+        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+      >
+        Espace organisateur
+      </p>
+      <h1
+        id="heading"
+        class="balance mt-1.5 text-[19px] font-bold leading-snug tracking-tight text-stone-900"
+      >
+        Vérification en cours…
+      </h1>
+      <p
+        id="message"
+        class="pretty mt-1.5 text-[13px] leading-relaxed text-stone-600"
+      >
+        Un instant.
+      </p>
+
+      <a
+        id="cta"
+        href="/connexion"
+        hidden
+        class="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+        >Me connecter</a
+      >
+    </div>
+
+    <p class="mt-6 text-center text-[11.5px] text-stone-400">
+      <a href="/" class="hover:text-stone-600">Retour à l'accueil</a>
+    </p>
+  </div>
+
+  <script>
+    import { pb } from '../lib/pb'
+
+    const heading = document.getElementById('heading') as HTMLHeadingElement
+    const message = document.getElementById('message') as HTMLParagraphElement
+    const cta = document.getElementById('cta') as HTMLAnchorElement
+
+    const token = new URLSearchParams(location.search).get('token') ?? ''
+
+    async function run() {
+      if (!token) {
+        heading.textContent = 'Lien invalide'
+        message.textContent =
+          'Ce lien de vérification est incomplet. Reprends le lien exact reçu par e-mail.'
+        return
+      }
+      try {
+        await pb('/api/collections/users/confirm-verification', {
+          method: 'POST',
+          body: { token },
+        })
+        heading.textContent = 'Compte activé'
+        message.textContent =
+          'Ton adresse est confirmée. Tu peux maintenant te connecter.'
+        cta.hidden = false
+      } catch {
+        heading.textContent = 'Lien invalide ou expiré'
+        message.textContent =
+          'Ce lien ne fonctionne plus. Reconnecte-toi pour recevoir un nouvel e-mail, ou refais une demande.'
+      }
+    }
+
+    run()
+  </script>
+</Layout>

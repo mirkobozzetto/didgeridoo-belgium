@@ -25,6 +25,13 @@ services:
       dockerfile: Dockerfile.pocketbase
     image: didge-pocketbase:latest
     restart: unless-stopped
+    environment:
+      APP_URL: ${APP_URL:-https://didgeridoo.top}
+      SMTP_HOST: ${SMTP_HOST:-smtp-relay.brevo.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_SENDER: ${SMTP_SENDER:-didgeridoo@mirko.re}
     ports:
       # Admin UI (/_/) : accès via tunnel SSH uniquement, jamais exposé au public.
       - "127.0.0.1:8090:8090"

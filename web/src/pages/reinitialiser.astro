@@ -1,0 +1,134 @@
+---
+import Layout from '../layouts/Layout.astro'
+---
+
+<Layout title="Nouveau mot de passe — Didgeridoo Belgique">
+  <div
+    class="mx-auto flex min-h-[100dvh] max-w-md flex-col justify-center px-5 py-10 sm:px-8"
+  >
+    <header class="pb-6 text-center">
+      <a href="/" class="text-[13.5px] font-extrabold tracking-[0.08em]">
+        <span class="text-stone-900">didge</span><span class="text-flag-yellow"
+          >ridoo</span
+        ><span class="text-flag-red">.top</span>
+      </a>
+    </header>
+
+    <div
+      class="relative overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5"
+    >
+      <span
+        class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+      ></span>
+
+      <p
+        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+      >
+        Espace organisateur
+      </p>
+      <h1
+        class="balance mt-1.5 text-[19px] font-bold leading-snug tracking-tight text-stone-900"
+      >
+        Nouveau mot de passe
+      </h1>
+      <p class="pretty mt-1.5 text-[13px] leading-relaxed text-stone-600">
+        Choisis un nouveau mot de passe pour ton compte.
+      </p>
+
+      <form id="reset-form" novalidate class="mt-5 flex flex-col gap-4">
+        <label class="field block pb-2">
+          <span
+            class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+            >Nouveau mot de passe</span
+          >
+          <input
+            type="password"
+            name="password"
+            required
+            autocomplete="new-password"
+            placeholder="8 caractères minimum"
+            class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+          />
+        </label>
+
+        <div
+          id="error"
+          hidden
+          class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700"
+        >
+        </div>
+
+        <div
+          id="notice"
+          hidden
+          class="rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-[13px] text-stone-700"
+        >
+        </div>
+
+        <button
+          type="submit"
+          class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
+        >
+          Enregistrer
+        </button>
+      </form>
+    </div>
+
+    <p class="mt-6 text-center text-[11.5px] text-stone-400">
+      <a href="/connexion" class="hover:text-stone-600">Retour à la connexion</a
+      >
+    </p>
+  </div>
+
+  <script>
+    import { pb } from '../lib/pb'
+
+    const form = document.getElementById('reset-form') as HTMLFormElement
+    const errorEl = document.getElementById('error') as HTMLDivElement
+    const noticeEl = document.getElementById('notice') as HTMLDivElement
+    const button = form.querySelector(
+      'button[type="submit"]',
+    ) as HTMLButtonElement
+
+    const token = new URLSearchParams(location.search).get('token') ?? ''
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const password = String(new FormData(form).get('password') ?? '')
+
+      errorEl.hidden = true
+      noticeEl.hidden = true
+
+      if (!token) {
+        errorEl.hidden = false
+        errorEl.textContent =
+          'Lien incomplet : reprends le lien exact reçu par e-mail.'
+        return
+      }
+      if (password.length < 8) {
+        errorEl.hidden = false
+        errorEl.textContent =
+          'Le mot de passe doit faire au moins 8 caractères.'
+        return
+      }
+
+      button.disabled = true
+      try {
+        await pb('/api/collections/users/confirm-password-reset', {
+          method: 'POST',
+          body: { token, password, passwordConfirm: password },
+        })
+        noticeEl.hidden = false
+        noticeEl.textContent =
+          'Mot de passe changé. Tu peux te connecter avec le nouveau.'
+        form.reset()
+      } catch {
+        errorEl.hidden = false
+        errorEl.textContent =
+          'Lien invalide ou expiré. Refais "Mot de passe oublié" depuis la page de connexion.'
+      } finally {
+        button.disabled = false
+      }
+    })
+  </script>
+</Layout>
