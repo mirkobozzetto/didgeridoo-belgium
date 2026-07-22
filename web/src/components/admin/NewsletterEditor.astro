@@ -1,0 +1,82 @@
+---
+// Markup de l'éditeur de newsletter. La logique vit dans le script de la page.
+---
+
+<div id="editor" hidden class="flex flex-col gap-6">
+  <div
+    class="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5"
+  >
+    <label class="field flex flex-col pb-2">
+      <span
+        class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+        >Sujet de l'e-mail</span
+      >
+      <input
+        id="subject"
+        type="text"
+        required
+        class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
+        placeholder="Les prochains rendez-vous didgeridoo"
+      />
+    </label>
+    <label class="flex flex-col">
+      <span
+        class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+        >Introduction</span
+      >
+      <textarea
+        id="intro"
+        rows="5"
+        class="mt-1.5 rounded-xl border border-stone-200 bg-stone-50 p-3 text-[15px] leading-relaxed text-stone-900 outline-none focus:border-brand-400"
+        placeholder="Un mot pour la communauté…"></textarea>
+    </label>
+  </div>
+
+  <div
+    class="rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5"
+  >
+    <p
+      class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+    >
+      Événements à insérer
+    </p>
+    <div id="events-state" class="py-6 text-center text-[13px] text-stone-400">
+      Chargement…
+    </div>
+    <ul id="events" class="mt-2 flex flex-col gap-2"></ul>
+  </div>
+
+  <div class="flex flex-wrap gap-3">
+    <button
+      id="preview-btn"
+      type="button"
+      class="inline-flex items-center justify-center rounded-xl bg-stone-900 px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-stone-700 active:translate-y-px"
+    >
+      Aperçu
+    </button>
+    <button
+      id="send-btn"
+      type="button"
+      class="inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-2.5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
+    >
+      Envoyer à la liste
+    </button>
+  </div>
+  <p id="feedback" hidden class="text-[14px]"></p>
+
+  <div
+    id="preview-wrap"
+    hidden
+    class="overflow-hidden rounded-2xl border border-stone-200 bg-white"
+  >
+    <div
+      class="border-b border-stone-100 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400"
+    >
+      Aperçu de l'e-mail
+    </div>
+    <iframe
+      id="preview-frame"
+      title="Aperçu de la newsletter"
+      class="h-[600px] w-full border-0"></iframe>
+  </div>
+</div>

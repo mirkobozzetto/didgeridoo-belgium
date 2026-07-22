@@ -1,0 +1,74 @@
+---
+// Markup du tableau de modération. Toute la logique vit dans le script
+// de la page (lib/admin-session, lib/admin-api, lib/admin-cards).
+---
+
+<div id="board" hidden class="flex flex-col gap-8">
+  <section>
+    <h2
+      class="text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-400"
+    >
+      Propositions en attente
+    </h2>
+    <div id="pending-state" class="py-6 text-[13px] text-stone-400">
+      Chargement…
+    </div>
+    <div id="pending-list" class="mt-3 flex flex-col gap-5"></div>
+  </section>
+
+  <details
+    class="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-stone-900/5"
+  >
+    <summary
+      class="cursor-pointer list-none text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-500"
+      >Dernières publiées</summary
+    >
+    <div id="published-state" class="py-4 text-[13px] text-stone-400">
+      Chargement…
+    </div>
+    <div id="published-list" class="mt-3 flex flex-col gap-3"></div>
+  </details>
+
+  <details
+    class="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-stone-900/5"
+  >
+    <summary
+      class="cursor-pointer list-none text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-500"
+      >Derniers refus</summary
+    >
+    <div id="rejected-state" class="py-4 text-[13px] text-stone-400">
+      Chargement…
+    </div>
+    <div id="rejected-list" class="mt-3 flex flex-col gap-3"></div>
+  </details>
+</div>
+
+<style is:global>
+  .rte-desc p {
+    margin: 0 0 0.5rem;
+  }
+  .rte-desc p:last-child {
+    margin-bottom: 0;
+  }
+  .rte-desc ul {
+    list-style: disc;
+    padding-left: 1.3rem;
+    margin: 0 0 0.5rem;
+  }
+  .rte-desc ol {
+    list-style: decimal;
+    padding-left: 1.3rem;
+    margin: 0 0 0.5rem;
+  }
+  .rte-desc li {
+    margin: 0.1rem 0;
+  }
+  .rte-desc strong,
+  .rte-desc b {
+    font-weight: 700;
+  }
+  .rte-desc a {
+    color: var(--color-brand-600);
+    text-decoration: underline;
+  }
+</style>

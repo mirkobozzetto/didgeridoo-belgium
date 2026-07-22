@@ -1,0 +1,23 @@
+---
+import AdminTabs from '../AdminTabs.astro'
+
+interface Props {
+  title: string
+  active: 'moderation' | 'newsletter'
+}
+const { title, active } = Astro.props
+---
+
+<section class="py-7">
+  <p
+    class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+  >
+    Administration
+  </p>
+  <h1
+    class="balance mt-1.5 text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-stone-900"
+  >
+    {title}
+  </h1>
+  <AdminTabs active={active} />
+</section>

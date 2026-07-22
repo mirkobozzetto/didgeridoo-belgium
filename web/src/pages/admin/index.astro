@@ -2,95 +2,25 @@
 import Layout from '../../layouts/Layout.astro'
 import PageShell from '../../layouts/PageShell.astro'
 import AccountNav from '../../components/AccountNav.astro'
-import AdminTabs from '../../components/AdminTabs.astro'
+import AdminHeader from '../../components/admin/AdminHeader.astro'
 import AdminLoginForm from '../../components/AdminLoginForm.astro'
+import ModerationBoard from '../../components/admin/ModerationBoard.astro'
 ---
 
 <Layout title="Modération - Administration">
   <PageShell width="3xl">
     <AccountNav active="admin" />
-
-    <section class="py-7">
-      <p
-        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
-      >
-        Administration
-      </p>
-      <h1
-        class="balance mt-1.5 text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-stone-900"
-      >
-        Modération
-      </h1>
-      <AdminTabs active="moderation" />
-    </section>
-
+    <AdminHeader title="Modération" active="moderation" />
     <AdminLoginForm />
-
-    <div id="board" hidden class="flex flex-col gap-8">
-      <section>
-        <h2
-          class="text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-400"
-        >
-          Propositions en attente
-        </h2>
-        <div id="pending-state" class="py-6 text-[13px] text-stone-400">
-          Chargement…
-        </div>
-        <div id="pending-list" class="mt-3 flex flex-col gap-5"></div>
-      </section>
-
-      <details
-        class="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-stone-900/5"
-      >
-        <summary
-          class="cursor-pointer list-none text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-500"
-          >Dernières publiées</summary
-        >
-        <div id="published-state" class="py-4 text-[13px] text-stone-400">
-          Chargement…
-        </div>
-        <div id="published-list" class="mt-3 flex flex-col gap-3"></div>
-      </details>
-
-      <details
-        class="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] ring-1 ring-stone-900/5"
-      >
-        <summary
-          class="cursor-pointer list-none text-[12px] font-semibold uppercase tracking-[0.16em] text-stone-500"
-          >Derniers refus</summary
-        >
-        <div id="rejected-state" class="py-4 text-[13px] text-stone-400">
-          Chargement…
-        </div>
-        <div id="rejected-list" class="mt-3 flex flex-col gap-3"></div>
-      </details>
-    </div>
+    <ModerationBoard />
   </PageShell>
 
   <script>
-    import {
-      getAdminAuth,
-      setAdminAuth,
-      clearAllAuth,
-      type PbAuth,
-    } from '../../lib/pb'
+    import { initAdminSession } from '../../lib/admin-session'
+    import { fetchEvents, patchStatus } from '../../lib/admin-api'
+    import { pendingCard, compactRow, inlineError } from '../../lib/admin-cards'
 
-    const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
-
-    const CATEGORIES: Record<string, string> = {
-      stage: 'Stage',
-      concert: 'Concert',
-      festival: 'Festival',
-      rencontre: 'Rencontre',
-      autre: 'Autre',
-    }
-
-    const loginForm = document.getElementById('login') as HTMLFormElement
-    const loginError = document.getElementById(
-      'login-error',
-    ) as HTMLParagraphElement
     const board = document.getElementById('board') as HTMLDivElement
-
     const pendingState = document.getElementById(
       'pending-state',
     ) as HTMLDivElement
@@ -110,400 +40,12 @@ import AdminLoginForm from '../../components/AdminLoginForm.astro'
       'rejected-list',
     ) as HTMLDivElement
 
-    interface Organizer {
-      name?: string
-      email?: string
-    }
+    const session = initAdminSession({ panel: board, onAuth: refreshAll })
 
-    interface Session {
-      date: string
-      start: string
-      end: string | null
-    }
-
-    interface EventRecord {
-      id: string
-      title: string
-      category?: string
-      start: string
-      end?: string
-      location?: string
-      description?: string
-      price?: string
-      contact?: string
-      registration_url?: string
-      poster?: string
-      status: string
-      rejection_reason?: string
-      sessions?: Session[]
-      expand?: { organizer?: Organizer }
-    }
-
-    function getToken(): string | null {
-      return getAdminAuth()?.token ?? null
-    }
-
-    function show(authenticated: boolean) {
-      loginForm.hidden = authenticated
-      board.hidden = !authenticated
-    }
-
-    function fmtDate(value: string): string {
-      const iso = value.replace(' ', 'T') + (value.includes('Z') ? '' : 'Z')
-      const d = new Date(iso)
-      if (Number.isNaN(d.getTime())) return value
-      return new Intl.DateTimeFormat('fr-BE', {
-        dateStyle: 'long',
-        timeStyle: 'short',
-        timeZone: 'Europe/Brussels',
-      }).format(d)
-    }
-
-    function handleExpired() {
-      clearAllAuth()
-      show(false)
-      loginError.hidden = false
-      loginError.textContent = 'Session expirée, reconnecte-toi.'
-    }
-
-    function posterUrl(ev: EventRecord): string | null {
-      if (!ev.poster) return null
-      return `${API_BASE}/pb/api/files/events/${ev.id}/${ev.poster}`
-    }
-
-    const ALLOWED_TAGS = new Set([
-      'P',
-      'BR',
-      'B',
-      'STRONG',
-      'I',
-      'EM',
-      'UL',
-      'OL',
-      'LI',
-      'A',
-    ])
-
-    function sanitize(html: string): string {
-      const doc = new DOMParser().parseFromString(html, 'text/html')
-      const walk = (node: Element) => {
-        for (const el of Array.from(node.children)) {
-          walk(el)
-          if (!ALLOWED_TAGS.has(el.tagName)) {
-            el.replaceWith(...Array.from(el.childNodes))
-            continue
-          }
-          const href = el.tagName === 'A' ? (el.getAttribute('href') ?? '') : ''
-          for (const attr of Array.from(el.attributes))
-            el.removeAttribute(attr.name)
-          if (el.tagName === 'A' && /^https?:\/\//i.test(href)) {
-            el.setAttribute('href', href)
-            el.setAttribute('rel', 'noopener')
-            el.setAttribute('target', '_blank')
-          }
-        }
-      }
-      walk(doc.body)
-      return doc.body.innerHTML
-    }
-
-    async function fetchEvents(
-      filter: string,
-      sort: string,
-      perPage = 200,
-    ): Promise<EventRecord[] | null> {
-      const token = getToken()
-      if (!token) return null
-      const q = encodeURIComponent(filter)
-      const res = await fetch(
-        `${API_BASE}/pb/api/collections/events/records?perPage=${perPage}&filter=${q}&sort=${sort}&expand=organizer`,
-        { headers: { authorization: token } },
-      )
-      if (res.status === 401) {
-        handleExpired()
-        return null
-      }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const json = (await res.json()) as { items: EventRecord[] }
-      return json.items
-    }
-
-    async function patchStatus(
-      id: string,
-      body: Record<string, string>,
-    ): Promise<string | null> {
-      const token = getToken()
-      if (!token) return 'Session expirée.'
-      const res = await fetch(
-        `${API_BASE}/pb/api/collections/events/records/${id}`,
-        {
-          method: 'PATCH',
-          headers: { 'content-type': 'application/json', authorization: token },
-          body: JSON.stringify(body),
-        },
-      )
-      if (res.status === 401) {
-        handleExpired()
-        return 'Session expirée.'
-      }
-      if (!res.ok) {
-        const json = (await res.json().catch(() => ({}))) as {
-          message?: string
-        }
-        return json.message ?? `Erreur ${res.status}.`
-      }
-      return null
-    }
-
-    const sessionDayFmt = new Intl.DateTimeFormat('fr-BE', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-      timeZone: 'Europe/Brussels',
-    })
-
-    function formatSession(s: Session): string {
-      const d = new Date(`${s.date}T00:00:00`)
-      if (Number.isNaN(d.getTime())) return s.date
-      const day = sessionDayFmt.format(d)
-      const cap = day.charAt(0).toUpperCase() + day.slice(1)
-      const time = s.end ? `${s.start} - ${s.end}` : `dès ${s.start}`
-      return `${cap} · ${time}`
-    }
-
-    function sessionsRow(sessions: Session[]): HTMLDivElement {
-      const row = document.createElement('div')
-      row.className = 'flex flex-col sm:col-span-2'
-      const l = document.createElement('span')
-      l.className =
-        'text-[10.5px] font-semibold uppercase tracking-[0.14em] text-stone-400'
-      l.textContent = sessions.length > 1 ? 'Dates' : 'Date'
-      row.appendChild(l)
-      for (const s of sessions) {
-        const v = document.createElement('span')
-        v.className = 'mt-0.5 text-[13.5px] text-stone-700'
-        v.textContent = formatSession(s)
-        row.appendChild(v)
-      }
-      return row
-    }
-
-    function detailRow(label: string, value: string): HTMLDivElement {
-      const row = document.createElement('div')
-      row.className = 'flex flex-col'
-      const l = document.createElement('span')
-      l.className =
-        'text-[10.5px] font-semibold uppercase tracking-[0.14em] text-stone-400'
-      l.textContent = label
-      const v = document.createElement('span')
-      v.className = 'mt-0.5 text-[13.5px] text-stone-700'
-      v.textContent = value
-      row.append(l, v)
-      return row
-    }
-
-    function inlineError(container: HTMLElement, msg: string) {
-      let el = container.querySelector(
-        '[data-err]',
-      ) as HTMLParagraphElement | null
-      if (!el) {
-        el = document.createElement('p')
-        el.dataset.err = 'true'
-        el.className = 'mt-2 text-[13px] text-red-600'
-        container.appendChild(el)
-      }
-      el.textContent = msg
-    }
-
-    function pendingCard(ev: EventRecord): HTMLElement {
-      const card = document.createElement('article')
-      card.className =
-        'overflow-hidden rounded-2xl bg-white shadow-[0_2px_4px_rgb(0_0_0/0.04),0_16px_40px_-24px_rgb(28_25_23/0.35)] ring-1 ring-stone-900/5'
-
-      const src = posterUrl(ev)
-      if (src) {
-        const img = document.createElement('img')
-        img.src = src
-        img.alt = `Affiche : ${ev.title}`
-        img.loading = 'lazy'
-        img.className = 'max-h-72 w-full object-cover'
-        card.appendChild(img)
-      }
-
-      const body = document.createElement('div')
-      body.className = 'flex flex-col gap-4 p-5'
-
-      const head = document.createElement('div')
-      head.className = 'flex items-start justify-between gap-3'
-      const titleWrap = document.createElement('div')
-      titleWrap.className = 'min-w-0'
-      const title = document.createElement('h3')
-      title.className =
-        'balance text-[17px] font-bold leading-snug tracking-tight text-stone-900'
-      title.textContent = ev.title
-      titleWrap.appendChild(title)
-      const org = ev.expand?.organizer
-      if (org?.name || org?.email) {
-        const orgLine = document.createElement('p')
-        orgLine.className = 'mt-0.5 text-[12.5px] text-stone-500'
-        orgLine.textContent = [org?.name, org?.email]
-          .filter(Boolean)
-          .join(' · ')
-        titleWrap.appendChild(orgLine)
-      }
-      head.appendChild(titleWrap)
-      if (ev.category) {
-        const badge = document.createElement('span')
-        badge.className =
-          'shrink-0 rounded-full bg-stone-100 px-3 py-1 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-stone-600 ring-1 ring-inset ring-stone-200'
-        badge.textContent = CATEGORIES[ev.category] ?? ev.category
-        head.appendChild(badge)
-      }
-      body.appendChild(head)
-
-      const grid = document.createElement('div')
-      grid.className = 'grid grid-cols-1 gap-3 sm:grid-cols-2'
-      if (Array.isArray(ev.sessions) && ev.sessions.length) {
-        grid.appendChild(sessionsRow(ev.sessions))
-      } else {
-        grid.appendChild(detailRow('Début', fmtDate(ev.start)))
-        if (ev.end) grid.appendChild(detailRow('Fin', fmtDate(ev.end)))
-      }
-      if (ev.location) grid.appendChild(detailRow('Lieu', ev.location))
-      if (ev.price) grid.appendChild(detailRow('Prix', ev.price))
-      if (ev.contact) grid.appendChild(detailRow('Contact', ev.contact))
-      body.appendChild(grid)
-
-      if (ev.description) {
-        const desc = document.createElement('div')
-        desc.className =
-          'rte-desc pretty text-[13.5px] leading-relaxed text-stone-600'
-        desc.innerHTML = sanitize(ev.description)
-        body.appendChild(desc)
-      }
-
-      if (ev.registration_url) {
-        const link = document.createElement('a')
-        link.href = ev.registration_url
-        link.target = '_blank'
-        link.rel = 'noopener noreferrer'
-        link.className =
-          'text-[13px] font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700'
-        link.textContent = "Lien d'inscription"
-        body.appendChild(link)
-      }
-
-      const actions = document.createElement('div')
-      actions.className =
-        'flex flex-wrap items-center gap-3 border-t border-stone-900/[0.06] pt-4'
-
-      const approve = document.createElement('button')
-      approve.type = 'button'
-      approve.className =
-        'inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px'
-      approve.textContent = 'Approuver'
-
-      const rejectToggle = document.createElement('button')
-      rejectToggle.type = 'button'
-      rejectToggle.className =
-        'inline-flex items-center justify-center rounded-xl bg-stone-100 px-4 py-2 text-[13px] font-semibold text-stone-700 transition hover:bg-stone-200 active:translate-y-px'
-      rejectToggle.textContent = 'Refuser'
-
-      actions.append(approve, rejectToggle)
-      body.appendChild(actions)
-
-      const rejectBox = document.createElement('div')
-      rejectBox.hidden = true
-      rejectBox.className = 'flex flex-col gap-2'
-      const reasonInput = document.createElement('textarea')
-      reasonInput.rows = 3
-      reasonInput.placeholder = "Motif du refus (communiqué à l'organisateur)"
-      reasonInput.className =
-        'rounded-xl border border-stone-200 bg-stone-50 p-3 text-[14px] leading-relaxed text-stone-900 outline-none focus:border-brand-400'
-      const confirmReject = document.createElement('button')
-      confirmReject.type = 'button'
-      confirmReject.className =
-        'self-start inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-red-700 active:translate-y-px'
-      confirmReject.textContent = 'Confirmer le refus'
-      rejectBox.append(reasonInput, confirmReject)
-      body.appendChild(rejectBox)
-
-      approve.addEventListener('click', async () => {
-        approve.disabled = true
-        const err = await patchStatus(ev.id, { status: 'published' })
-        if (err) {
-          approve.disabled = false
-          inlineError(body, err)
-          return
-        }
-        refreshAll()
-      })
-
-      rejectToggle.addEventListener('click', () => {
-        rejectBox.hidden = !rejectBox.hidden
-        if (!rejectBox.hidden) reasonInput.focus()
-      })
-
-      confirmReject.addEventListener('click', async () => {
-        confirmReject.disabled = true
-        const err = await patchStatus(ev.id, {
-          status: 'rejected',
-          rejection_reason: reasonInput.value.trim(),
-        })
-        if (err) {
-          confirmReject.disabled = false
-          inlineError(body, err)
-          return
-        }
-        refreshAll()
-      })
-
-      return card
-    }
-
-    function compactRow(
-      ev: EventRecord,
-      action?: { label: string; run: () => Promise<void> },
-    ): HTMLElement {
-      const row = document.createElement('div')
-      row.className =
-        'flex items-start justify-between gap-3 rounded-xl border border-stone-200 p-3'
-
-      const info = document.createElement('div')
-      info.className = 'min-w-0'
-      const title = document.createElement('p')
-      title.className = 'truncate text-[14px] font-semibold text-stone-900'
-      title.textContent = ev.title
-      const meta = document.createElement('p')
-      meta.className = 'mt-0.5 text-[12px] text-stone-500'
-      meta.textContent = [fmtDate(ev.start), ev.location]
-        .filter(Boolean)
-        .join(' · ')
-      info.append(title, meta)
-      row.appendChild(info)
-
-      if (ev.status === 'rejected' && ev.rejection_reason) {
-        const reason = document.createElement('p')
-        reason.className = 'mt-1 text-[12px] text-red-600'
-        reason.textContent = `Motif : ${ev.rejection_reason}`
-        info.appendChild(reason)
-      }
-
-      if (action) {
-        const btn = document.createElement('button')
-        btn.type = 'button'
-        btn.className =
-          'shrink-0 inline-flex items-center justify-center rounded-lg bg-stone-100 px-3 py-1.5 text-[12px] font-semibold text-stone-700 transition hover:bg-stone-200 active:translate-y-px'
-        btn.textContent = action.label
-        btn.addEventListener('click', async () => {
-          btn.disabled = true
-          await action.run()
-        })
-        row.appendChild(btn)
-      }
-
-      return row
+    const cardActions = {
+      patchStatus: (id: string, body: Record<string, string>) =>
+        patchStatus(session, id, body),
+      onChange: refreshAll,
     }
 
     async function loadPending() {
@@ -511,14 +53,19 @@ import AdminLoginForm from '../../components/AdminLoginForm.astro'
       pendingState.textContent = 'Chargement…'
       pendingList.replaceChildren()
       try {
-        const items = await fetchEvents("(status='pending')", 'created')
+        const items = await fetchEvents(
+          session,
+          "(status='pending')",
+          'created',
+        )
         if (!items) return
         if (!items.length) {
           pendingState.textContent = 'Aucune proposition en attente.'
           return
         }
         pendingState.hidden = true
-        for (const ev of items) pendingList.appendChild(pendingCard(ev))
+        for (const ev of items)
+          pendingList.appendChild(pendingCard(ev, cardActions))
       } catch {
         pendingState.hidden = false
         pendingState.textContent = 'Impossible de charger les propositions.'
@@ -530,7 +77,12 @@ import AdminLoginForm from '../../components/AdminLoginForm.astro'
       publishedState.textContent = 'Chargement…'
       publishedList.replaceChildren()
       try {
-        const items = await fetchEvents("(status='published')", '-updated', 10)
+        const items = await fetchEvents(
+          session,
+          "(status='published')",
+          '-updated',
+          10,
+        )
         if (!items) return
         if (!items.length) {
           publishedState.textContent = 'Aucun événement publié.'
@@ -542,7 +94,9 @@ import AdminLoginForm from '../../components/AdminLoginForm.astro'
             compactRow(ev, {
               label: 'Dépublier',
               run: async () => {
-                const err = await patchStatus(ev.id, { status: 'pending' })
+                const err = await patchStatus(session, ev.id, {
+                  status: 'pending',
+                })
                 if (err) {
                   inlineError(publishedList, err)
                   return
@@ -563,7 +117,12 @@ import AdminLoginForm from '../../components/AdminLoginForm.astro'
       rejectedState.textContent = 'Chargement…'
       rejectedList.replaceChildren()
       try {
-        const items = await fetchEvents("(status='rejected')", '-updated', 10)
+        const items = await fetchEvents(
+          session,
+          "(status='rejected')",
+          '-updated',
+          10,
+        )
         if (!items) return
         if (!items.length) {
           rejectedState.textContent = 'Aucun refus.'
@@ -582,74 +141,5 @@ import AdminLoginForm from '../../components/AdminLoginForm.astro'
       loadPublished()
       loadRejected()
     }
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      loginError.hidden = true
-      const identity = (
-        document.getElementById('identity') as HTMLInputElement
-      ).value.trim()
-      const password = (document.getElementById('password') as HTMLInputElement)
-        .value
-      try {
-        const res = await fetch(
-          `${API_BASE}/pb/api/collections/_superusers/auth-with-password`,
-          {
-            method: 'POST',
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ identity, password }),
-          },
-        )
-        const json = (await res.json()) as PbAuth & { message?: string }
-        if (!res.ok || !json.token) {
-          loginError.hidden = false
-          loginError.textContent = json.message ?? 'Identifiants invalides.'
-          return
-        }
-        setAdminAuth(json)
-        show(true)
-        refreshAll()
-      } catch {
-        loginError.hidden = false
-        loginError.textContent = 'Connexion impossible. Réessaie.'
-      }
-    })
-
-    if (getToken()) {
-      show(true)
-      refreshAll()
-    } else {
-      show(false)
-    }
   </script>
-
-  <style>
-    .rte-desc p {
-      margin: 0 0 0.5rem;
-    }
-    .rte-desc p:last-child {
-      margin-bottom: 0;
-    }
-    .rte-desc ul {
-      list-style: disc;
-      padding-left: 1.3rem;
-      margin: 0 0 0.5rem;
-    }
-    .rte-desc ol {
-      list-style: decimal;
-      padding-left: 1.3rem;
-      margin: 0 0 0.5rem;
-    }
-    .rte-desc li {
-      margin: 0.1rem 0;
-    }
-    .rte-desc strong,
-    .rte-desc b {
-      font-weight: 700;
-    }
-    .rte-desc a {
-      color: var(--color-brand-600);
-      text-decoration: underline;
-    }
-  </style>
 </Layout>

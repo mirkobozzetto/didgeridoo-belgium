@@ -1,4 +1,8 @@
-const BASE = `${(import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')}/pb`
+export const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(
+  /\/$/,
+  '',
+)
+const BASE = `${API_BASE}/pb`
 
 export const AUTH_KEY = 'pb_auth'
 export const ADMIN_AUTH_KEY = 'pb_admin_auth'
