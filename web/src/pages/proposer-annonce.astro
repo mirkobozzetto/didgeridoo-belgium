@@ -138,10 +138,12 @@ import { btn } from '../lib/button-styles'
   </PageShell>
 
   <script>
-    import { pb, getAuth } from '../lib/pb'
+    import { pb, getAuth, getAnyAuth } from '../lib/pb'
     import { sanitize } from '../lib/sanitize'
 
-    const auth = getAuth()
+    // Compte organisateur OU session admin : les deux peuvent proposer.
+    const authorAuth = getAuth()
+    const auth = getAnyAuth()
     if (!auth) location.replace('/connexion')
 
     const MAX_BYTES = 5 * 1024 * 1024
@@ -274,14 +276,14 @@ import { btn } from '../lib/button-styles'
             auth: true,
           })
         } else {
-          payload.set('author', auth!.record.id)
+          if (authorAuth) payload.set('author', authorAuth.record.id)
           await pb('/api/collections/annonces/records', {
             method: 'POST',
             body: payload,
             auth: true,
           })
         }
-        window.location.replace('/mes-propositions')
+        window.location.replace(authorAuth ? '/mes-propositions' : '/admin')
       } catch (err) {
         const status = (err as { status?: number })?.status
         if (status === 401 || status === 403) {

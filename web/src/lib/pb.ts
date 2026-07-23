@@ -52,6 +52,12 @@ export function clearAllAuth(): void {
   localStorage.removeItem(ADMIN_AUTH_KEY)
 }
 
+// Session organisateur si présente, sinon session superuser : l'admin peut
+// utiliser les formulaires publics (proposer) sans compte users.
+export function getAnyAuth(): PbAuth | null {
+  return getAuth() ?? getAdminAuth()
+}
+
 export interface LoginResult {
   organizer: boolean
   admin: boolean
@@ -111,7 +117,7 @@ export async function pb<T = unknown>(
 
   if (body != null && !isForm) headers['content-type'] = 'application/json'
   if (auth) {
-    const current = getAuth()
+    const current = getAnyAuth()
     if (current) headers['authorization'] = current.token
   }
 
