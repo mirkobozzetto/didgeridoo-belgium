@@ -10,9 +10,11 @@ services:
     environment:
       BREVO_API_KEY: ${BREVO_API_KEY}
       BREVO_LIST_ID: ${BREVO_LIST_ID}
+      BREVO_DOI_TEMPLATE_ID: ${BREVO_DOI_TEMPLATE_ID}
       BREVO_SENDER_EMAIL: ${BREVO_SENDER_EMAIL}
       BREVO_SENDER_NAME: ${BREVO_SENDER_NAME}
       WHATSAPP_INVITE_URL: ${WHATSAPP_INVITE_URL}
+      APP_URL: ${APP_URL:-https://didgeridoo.top}
       POCKETBASE_URL: http://pocketbase:8090
       PORT: 3000
       STATIC_ROOT: /app/public

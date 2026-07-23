@@ -139,6 +139,65 @@ async function fetchPublishedEvents(ids: string[]): Promise<EventRecord[]> {
     .filter((ev): ev is EventRecord => Boolean(ev))
 }
 
+// Crée une campagne Brevo et l'envoie immédiatement à la liste.
+// Partagé entre l'envoi manuel (admin) et les crons (rappels, digest).
+export async function sendCampaign(
+  subject: string,
+  htmlContent: string,
+): Promise<
+  | { ok: true; campaignId: number }
+  | { ok: false; error: string; status: number }
+> {
+  if (!BREVO_API_KEY || !BREVO_LIST_ID) {
+    console.error('Config Brevo manquante (BREVO_API_KEY / BREVO_LIST_ID)')
+    return { ok: false, error: 'server_misconfigured', status: 500 }
+  }
+
+  const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ')
+
+  const createRes = await fetch(BREVO_CAMPAIGNS_URL, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      'api-key': BREVO_API_KEY,
+    },
+    body: JSON.stringify({
+      name: `${subject} - ${stamp}`,
+      subject,
+      sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+      type: 'classic',
+      htmlContent,
+      recipients: { listIds: [BREVO_LIST_ID] },
+    }),
+  })
+
+  if (!createRes.ok) {
+    const detail = await createRes.text()
+    console.error('Création campagne Brevo échouée:', createRes.status, detail)
+    return { ok: false, error: detail, status: 502 }
+  }
+
+  const created = (await createRes.json()) as { id?: number }
+  const campaignId = created.id
+  if (!campaignId) {
+    return { ok: false, error: 'campaign_id_missing', status: 502 }
+  }
+
+  const sendRes = await fetch(`${BREVO_CAMPAIGNS_URL}/${campaignId}/sendNow`, {
+    method: 'POST',
+    headers: { accept: 'application/json', 'api-key': BREVO_API_KEY },
+  })
+
+  if (!sendRes.ok) {
+    const detail = await sendRes.text()
+    console.error('Envoi campagne Brevo échoué:', sendRes.status, detail)
+    return { ok: false, error: detail, status: 502 }
+  }
+
+  return { ok: true, campaignId }
+}
+
 type Payload = { subject?: string; intro?: string; eventIds?: unknown }
 
 function readPayload(body: Payload): {
@@ -196,64 +255,18 @@ newsletter.post('/send', async (c) => {
   const { subject, intro, ids } = readPayload(body)
   if (!subject) return c.json({ ok: false, error: 'subject_required' }, 400)
 
-  if (!BREVO_API_KEY || !BREVO_LIST_ID) {
-    console.error('Config Brevo manquante (BREVO_API_KEY / BREVO_LIST_ID)')
-    return c.json({ ok: false, error: 'server_misconfigured' }, 500)
-  }
-
   const events = await fetchPublishedEvents(ids)
   const htmlContent = buildNewsletterHtml(intro, events, requestOrigin(c))
-  const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ')
 
   try {
-    const createRes = await fetch(BREVO_CAMPAIGNS_URL, {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-        'api-key': BREVO_API_KEY,
-      },
-      body: JSON.stringify({
-        name: `${subject} - ${stamp}`,
-        subject,
-        sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
-        type: 'classic',
-        htmlContent,
-        recipients: { listIds: [BREVO_LIST_ID] },
-      }),
-    })
-
-    if (!createRes.ok) {
-      const detail = await createRes.text()
-      console.error(
-        'Création campagne Brevo échouée:',
-        createRes.status,
-        detail,
+    const result = await sendCampaign(subject, htmlContent)
+    if (!result.ok) {
+      return c.json(
+        { ok: false, error: result.error },
+        result.status as 500 | 502,
       )
-      return c.json({ ok: false, error: detail }, 502)
     }
-
-    const created = (await createRes.json()) as { id?: number }
-    const campaignId = created.id
-    if (!campaignId) {
-      return c.json({ ok: false, error: 'campaign_id_missing' }, 502)
-    }
-
-    const sendRes = await fetch(
-      `${BREVO_CAMPAIGNS_URL}/${campaignId}/sendNow`,
-      {
-        method: 'POST',
-        headers: { accept: 'application/json', 'api-key': BREVO_API_KEY },
-      },
-    )
-
-    if (!sendRes.ok) {
-      const detail = await sendRes.text()
-      console.error('Envoi campagne Brevo échoué:', sendRes.status, detail)
-      return c.json({ ok: false, error: detail }, 502)
-    }
-
-    return c.json({ ok: true, campaignId })
+    return c.json({ ok: true, campaignId: result.campaignId })
   } catch (err) {
     console.error('Appel Brevo échoué:', err)
     return c.json({ ok: false, error: 'network_error' }, 502)

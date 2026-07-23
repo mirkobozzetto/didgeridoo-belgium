@@ -3,6 +3,7 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { serveStatic } from 'hono/bun'
 import { newsletter } from './newsletter'
+import { startCron } from './cron'
 import { rateLimit } from './rate-limit'
 import { buildCalendar, buildVEvent, parseDate } from './ics'
 
@@ -16,8 +17,10 @@ const PORT = Number(process.env.PORT ?? '3000')
 // Dossier du build statique Astro (copié dans l'image Docker)
 const STATIC_ROOT = process.env.STATIC_ROOT ?? './public'
 
-const BREVO_API_URL =
-  process.env.BREVO_API_URL ?? 'https://api.brevo.com/v3/contacts'
+const BREVO_DOI_URL =
+  process.env.BREVO_API_URL ??
+  'https://api.brevo.com/v3/contacts/doubleOptinConfirmation'
+const BREVO_DOI_TEMPLATE_ID = Number(process.env.BREVO_DOI_TEMPLATE_ID ?? '0')
 const POCKETBASE_URL = process.env.POCKETBASE_URL ?? 'http://localhost:8090'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -43,7 +46,8 @@ app.use(
 )
 
 // ---------------------------------------------------------------------------
-// Endpoint d'inscription : crée/actualise le contact dans Brevo + ajout liste
+// Endpoint d'inscription : double opt-in Brevo. Le contact n'entre en liste
+// qu'après le clic dans l'e-mail de confirmation (template DOI Brevo).
 // ---------------------------------------------------------------------------
 app.post('/api/subscribe', async (c) => {
   let body: {
@@ -60,9 +64,8 @@ app.post('/api/subscribe', async (c) => {
   }
 
   // Honeypot : un humain ne voit pas ce champ, un bot le remplit.
-  // Drop silencieux, sans le lien WhatsApp.
   if ((body.website ?? '').trim() !== '') {
-    return c.json({ ok: true, whatsapp: '' })
+    return c.json({ ok: true })
   }
 
   const email = (body.email ?? '').trim().toLowerCase()
@@ -77,8 +80,10 @@ app.post('/api/subscribe', async (c) => {
     return c.json({ ok: false, error: 'consent_required' }, 400)
   }
 
-  if (!BREVO_API_KEY || !BREVO_LIST_ID) {
-    console.error('Config Brevo manquante (BREVO_API_KEY / BREVO_LIST_ID)')
+  if (!BREVO_API_KEY || !BREVO_LIST_ID || !BREVO_DOI_TEMPLATE_ID) {
+    console.error(
+      'Config Brevo manquante (BREVO_API_KEY / BREVO_LIST_ID / BREVO_DOI_TEMPLATE_ID)',
+    )
     return c.json({ ok: false, error: 'server_misconfigured' }, 500)
   }
 
@@ -89,12 +94,13 @@ app.post('/api/subscribe', async (c) => {
   const payload = {
     email,
     attributes,
-    listIds: [BREVO_LIST_ID],
-    updateEnabled: true, // évite l'erreur si le contact existe déjà
+    includeListIds: [BREVO_LIST_ID],
+    templateId: BREVO_DOI_TEMPLATE_ID,
+    redirectionUrl: `${requestOrigin(c)}/confirmation`,
   }
 
   try {
-    const res = await fetch(BREVO_API_URL, {
+    const res = await fetch(BREVO_DOI_URL, {
       method: 'POST',
       headers: {
         accept: 'application/json',
@@ -104,9 +110,9 @@ app.post('/api/subscribe', async (c) => {
       body: JSON.stringify(payload),
     })
 
-    // 201 = créé, 204 = mis à jour. Les deux sont des succès.
+    // 201 = e-mail DOI envoyé, 204 = contact déjà confirmé. Succès dans les deux cas.
     if (res.ok) {
-      return c.json({ ok: true, whatsapp: WHATSAPP_INVITE_URL })
+      return c.json({ ok: true })
     }
 
     const detail = await res.text()
@@ -117,6 +123,9 @@ app.post('/api/subscribe', async (c) => {
     return c.json({ ok: false, error: 'network_error' }, 502)
   }
 })
+
+// Lien WhatsApp pour la page /confirmation (après le clic DOI).
+app.get('/api/whatsapp', (c) => c.json({ ok: true, url: WHATSAPP_INVITE_URL }))
 
 // Petit healthcheck pour Docker / reverse proxy
 app.get('/api/health', (c) => c.json({ ok: true }))
@@ -315,6 +324,8 @@ app.get('/evenements/:slug', async (c) => {
 app.use('/*', serveStatic({ root: STATIC_ROOT }))
 // Fallback SPA-like : renvoie index.html pour les routes inconnues
 app.get('*', serveStatic({ path: `${STATIC_ROOT}/index.html` }))
+
+startCron()
 
 console.log(`Serveur prêt sur http://localhost:${PORT}`)
 
