@@ -7,17 +7,22 @@
 
 export type PillSegmentKind = 'default' | 'danger'
 
+// Segments pleine hauteur : l'extrême gauche/droite reprend l'arrondi du
+// groupe (first:/last:), les centraux restent rectangulaires ; le fill et
+// le contour du hover épousent donc la forme de base, jamais une pilule
+// dans la pilule. Séparateurs pleine hauteur.
 export function pillGroup(): string {
   return (
-    'inline-flex items-center rounded-full p-1 text-[13.5px] font-semibold text-stone-700 ' +
+    'inline-flex items-stretch overflow-hidden rounded-full text-[13.5px] font-semibold text-stone-700 ' +
     'bg-gradient-to-b from-white to-stone-50 ' +
     'shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(28_25_23/0.10),0_1px_2px_rgb(28_25_23/0.06)]'
   )
 }
 
 const SEGMENT_BASE =
-  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2 ' +
-  'transition-[background,color,box-shadow] duration-200 active:translate-y-px disabled:opacity-60'
+  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-5 py-2.5 ' +
+  'first:rounded-l-full last:rounded-r-full ' +
+  'transition-[background,color,box-shadow] duration-200 disabled:opacity-60'
 
 const SEGMENT_HOVER: Record<PillSegmentKind, string> = {
   default:
@@ -41,5 +46,5 @@ export function pillSegmentActive(): string {
 }
 
 export function pillSep(): string {
-  return 'mx-0.5 my-1.5 w-px flex-none self-stretch bg-stone-900/10'
+  return 'my-1.5 w-px flex-none self-stretch bg-stone-900/10'
 }
