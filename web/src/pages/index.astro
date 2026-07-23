@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import Brand from '../components/Brand.astro'
 import AccountMenu from '../components/AccountMenu.astro'
 import AuthNavSync from '../components/AuthNavSync.astro'
 import { AUTH_KEY, ADMIN_AUTH_KEY } from '../lib/pb'
@@ -38,11 +39,7 @@ const jsonLd = JSON.stringify([
         data-admin-auth-key={ADMIN_AUTH_KEY}
         class="relative flex items-center justify-between border-b border-stone-900/10 pb-4"
       >
-        <span class="text-[13.5px] font-extrabold tracking-[0.08em]">
-          <span class="text-stone-900">didge</span><span
-            class="text-flag-yellow">ridoo</span
-          ><span class="text-flag-red">.top</span>
-        </span>
+        <Brand />
         <nav class="hidden items-center gap-5 md:flex">
           <div data-nav-links class="relative flex items-center gap-6">
             <a
