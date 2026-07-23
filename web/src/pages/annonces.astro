@@ -20,7 +20,7 @@ import PageShell from '../layouts/PageShell.astro'
         class="pretty mt-2 max-w-prose text-[14px] leading-[1.7] text-stone-600"
       >
         Instruments, cours, artisanat et covoiturages de la communauté
-        didgeridoo en Belgique.
+        didgeridoo.
       </p>
     </section>
 
@@ -73,8 +73,8 @@ import PageShell from '../layouts/PageShell.astro'
     let activeCategory = ''
     let all: AnnonceRecord[] = []
 
-    const chipIdle = pillSegment()
-    const chipActive = pillSegmentActive()
+    const chipIdle = `${pillSegment()} flex-1`
+    const chipActive = `${pillSegmentActive()} flex-1`
 
     function card(ann: AnnonceRecord): HTMLAnchorElement {
       const a = document.createElement('a')
@@ -137,7 +137,7 @@ import PageShell from '../layouts/PageShell.astro'
         })),
       ]
       const pill = document.createElement('div')
-      pill.className = pillGroup()
+      pill.className = `${pillGroup()} flex w-full`
       const buttons: HTMLButtonElement[] = []
       chips.forEach((chip, i) => {
         if (i > 0) {
@@ -168,7 +168,7 @@ import PageShell from '../layouts/PageShell.astro'
       sep.setAttribute('aria-hidden', 'true')
       const cta = document.createElement('a')
       cta.href = '/proposer-annonce'
-      cta.className = pillSegmentCta()
+      cta.className = `${pillSegmentCta()} flex-none`
       cta.textContent = '+ Proposer une annonce'
       pill.append(sep, cta)
 

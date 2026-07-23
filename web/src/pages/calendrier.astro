@@ -26,7 +26,7 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
           class="pretty mt-2 max-w-prose text-[14px] leading-[1.7] text-stone-600"
         >
           Stages, concerts et rencontres autour du didgeridoo et de la culture
-          aborigène, en Belgique.
+          aborigène.
         </p>
       </div>
     </section>
@@ -41,7 +41,7 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
           <button type="button" data-cat="rencontre">Rencontre</button>
           <button type="button" data-cat="autre">Autre</button>
           <span class={pillSep()} aria-hidden="true"></span>
-          <a href="/proposer" class={pillSegmentCta()}>
+          <a href="/proposer" class={`${pillSegmentCta()} flex-none`}>
             + Proposer un événement
           </a>
         </div>
@@ -54,7 +54,7 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
       <div
         id="empty"
         hidden
-        class="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-card ring-1 ring-stone-900/5"
+        class="rounded-2xl border border-dashed border-stone-300 bg-white/60 px-6 py-12 text-center"
       >
         <img
           src="/didge-placeholder.webp"
@@ -143,13 +143,13 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
       autre: 'Autre',
     }
 
-    const CHIP_ON = pillSegmentActive()
-    const CHIP_OFF = pillSegment()
+    const CHIP_ON = `${pillSegmentActive()} flex-1`
+    const CHIP_OFF = `${pillSegment()} flex-1`
 
     const filterPill = document.querySelector(
       '[data-filter-pill]',
     ) as HTMLDivElement
-    filterPill.className = pillGroup()
+    filterPill.className = `${pillGroup()} flex w-full`
     // Classes posées dès l'init : à vide, applyFilter ne tourne jamais.
     for (const chip of Array.from(filterPill.querySelectorAll('button'))) {
       chip.className = chip.dataset.cat === 'all' ? CHIP_ON : CHIP_OFF
