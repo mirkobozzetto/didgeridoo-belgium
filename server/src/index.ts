@@ -171,6 +171,7 @@ type EventRecord = {
   location?: string
   description?: string
   poster?: string
+  price?: string
   registration_url?: string
 }
 
@@ -230,6 +231,72 @@ function stripHtml(s: string): string {
 
 function truncate(s: string, max: number): string {
   return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s
+}
+
+// JSON-LD schema.org Event pour Google Rich Results. Jamais d'email dedans.
+function eventJsonLd(
+  ev: EventRecord,
+  pageUrl: string,
+  image: string,
+  origin: string,
+): string {
+  const ld: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: ev.title,
+    startDate: parseDate(ev.start).toISOString(),
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    url: pageUrl,
+    image,
+    organizer: {
+      '@type': 'Organization',
+      name: 'Didgeridoo Belgique',
+      url: origin,
+    },
+  }
+  if (ev.end) ld.endDate = parseDate(ev.end).toISOString()
+  if (ev.location) {
+    ld.location = {
+      '@type': 'Place',
+      name: ev.location,
+      address: { '@type': 'PostalAddress', addressCountry: 'BE' },
+    }
+  }
+  if (ev.description) ld.description = stripHtml(ev.description)
+  if (ev.price) {
+    const num = ev.price.match(/\d+(?:[.,]\d+)?/)?.[0]?.replace(',', '.')
+    const free = /gratuit|libre|free/i.test(ev.price)
+    if (num || free) {
+      ld.offers = {
+        '@type': 'Offer',
+        price: free && !num ? '0' : num,
+        priceCurrency: 'EUR',
+        url: ev.registration_url || pageUrl,
+      }
+    }
+  }
+  // < bloque toute sortie de la balise script via un "</script>" injecté.
+  return JSON.stringify(ld).replace(/</g, '\\u003c')
+}
+
+// Contenu indexable sans JS ; le script client le masque au rendu complet.
+function eventSsrBlock(ev: EventRecord, dateLabel: string): string {
+  const parts = [
+    `<p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-600">${escapeHtml(dateLabel)}</p>`,
+    `<h1 class="mt-2 text-[clamp(2rem,4.5vw,3rem)] font-extrabold leading-[1.06] tracking-[-0.035em] text-stone-900">${escapeHtml(ev.title)}</h1>`,
+  ]
+  if (ev.location) {
+    parts.push(
+      `<p class="mt-3 text-[15px] text-stone-600">${escapeHtml(ev.location)}</p>`,
+    )
+  }
+  if (ev.description) {
+    parts.push(
+      `<div class="mt-6 text-[15px] leading-[1.75] text-stone-700">${escapeHtml(stripHtml(ev.description))}</div>`,
+    )
+  }
+  return `<div class="text-left">${parts.join('')}</div>`
 }
 
 app.get('/evenements/:file{.+\\.ics}', async (c) => {
@@ -304,6 +371,8 @@ app.get('/evenements/:slug', async (c) => {
     : `${origin}/hero.jpeg`
 
   const tags = [
+    `<script type="application/ld+json">${eventJsonLd(ev, pageUrl, image, origin)}</script>`,
+    `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
     `<meta property="og:title" content="${escapeHtml(ev.title)}" />`,
     `<meta property="og:type" content="article" />`,
     `<meta property="og:url" content="${escapeHtml(pageUrl)}" />`,
@@ -315,7 +384,21 @@ app.get('/evenements/:slug', async (c) => {
     `<meta name="twitter:image" content="${escapeHtml(image)}" />`,
   ].join('\n    ')
 
-  return c.html(shell.replace('</head>', `    ${tags}\n  </head>`))
+  const rendered = shell
+    .replace('</head>', `    ${tags}\n  </head>`)
+    // Titre + meta description propres à l'événement, sans attendre le JS.
+    .replace(
+      /<title>[^<]*<\/title>/,
+      `<title>${escapeHtml(ev.title)} — Didgeridoo Belgique</title>`,
+    )
+    .replace(
+      /<meta name="description" content="[^"]*"\s*\/?>/,
+      `<meta name="description" content="${escapeHtml(description)}"/>`,
+    )
+    // Le placeholder "Chargement…" devient le contenu indexable.
+    .replace(/<p[^>]*data-ssr[^>]*>[^<]*<\/p>/, eventSsrBlock(ev, dateLabel))
+
+  return c.html(rendered)
 })
 
 // ---------------------------------------------------------------------------

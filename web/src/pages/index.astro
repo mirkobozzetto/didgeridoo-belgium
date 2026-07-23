@@ -1,9 +1,30 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import { btn } from '../lib/button-styles'
+
+const SITE_URL = 'https://didgeridoo.top'
+const jsonLd = JSON.stringify([
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Didgeridoo Belgique',
+    url: SITE_URL,
+    logo: `${SITE_URL}/hero.jpeg`,
+    description:
+      'Communauté belge du didgeridoo et de la culture aborigène : stages, concerts, rencontres et petites annonces.',
+    areaServed: { '@type': 'Country', name: 'Belgique' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Didgeridoo Belgique',
+    url: SITE_URL,
+  },
+])
 ---
 
 <Layout>
+  <script type="application/ld+json" is:inline set:html={jsonLd} />
   <div class="mx-auto max-w-7xl px-5 pb-12 sm:px-8">
     <!-- Écran d'accueil : plein viewport, hero + formulaire -->
     <div class="flex min-h-[100dvh] flex-col py-4 lg:h-[100dvh]">

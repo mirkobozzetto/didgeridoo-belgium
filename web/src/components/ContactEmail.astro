@@ -1,0 +1,24 @@
+---
+// Anti-spam : l'adresse n'apparaît jamais en clair dans le HTML servi ni
+// sous forme de motif email dans le bundle ; elle est assemblée au runtime.
+---
+
+<a
+  href="#contact"
+  class="font-semibold text-brand-600 hover:text-brand-700"
+  data-contact>contact</a
+>
+
+<script>
+  // Segments inversés : aucun motif email ni fragment lisible dans le bundle.
+  const addr = ['er.okrim', 'oodiregdid']
+    .map((s) => [...s].reverse().join(''))
+    .reverse()
+    .join(String.fromCharCode(64))
+  document
+    .querySelectorAll<HTMLAnchorElement>('a[data-contact]')
+    .forEach((a) => {
+      a.href = `mailto:${addr}`
+      a.textContent = addr
+    })
+</script>

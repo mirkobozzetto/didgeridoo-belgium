@@ -10,8 +10,9 @@ import { btn } from '../lib/button-styles'
 >
   <PageShell width="3xl" nav>
     <main class="min-h-0 flex-1 py-7 sm:py-9">
-      <div id="loading" class="py-12 text-center text-[13px] text-stone-400">
-        Chargement…
+      <div id="loading" class="py-12 text-[13px] text-stone-400">
+        <!-- Remplacé côté serveur par le contenu indexable de l'événement. -->
+        <p class="text-center" data-ssr>Chargement…</p>
       </div>
 
       <div

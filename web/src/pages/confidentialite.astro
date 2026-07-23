@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
 import Brand from '../components/Brand.astro'
+import ContactEmail from '../components/ContactEmail.astro'
 
 const h2 = 'mt-8 text-[15px] font-bold tracking-tight text-stone-900 first:mt-0'
 const p = 'pretty mt-2 text-[13.5px] leading-relaxed text-stone-600'
@@ -58,11 +59,7 @@ const p = 'pretty mt-2 text-[13.5px] leading-relaxed text-stone-600'
       <h2 class={h2}>Tes droits</h2>
       <p class={p}>
         Accès, rectification, suppression : écris à
-        <a
-          href="mailto:didgeridoo@mirko.re"
-          class="font-semibold text-brand-600 hover:text-brand-700"
-          >didgeridoo@mirko.re</a
-        >. Réponse sous 30 jours (RGPD).
+        <ContactEmail />. Réponse sous 30 jours (RGPD).
       </p>
     </article>
 
