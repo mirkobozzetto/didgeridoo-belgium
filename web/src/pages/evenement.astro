@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
+import { btn } from '../lib/button-styles'
 ---
 
 <Layout
@@ -26,10 +27,7 @@ import PageShell from '../layouts/PageShell.astro'
         >
           Cet événement n'existe pas ou n'est plus disponible.
         </p>
-        <a
-          href="/calendrier"
-          class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
-        >
+        <a href="/calendrier" class:list={[btn('primary', 'md'), 'mt-5']}>
           Voir le calendrier
         </a>
       </div>
@@ -103,7 +101,7 @@ import PageShell from '../layouts/PageShell.astro'
           target="_blank"
           rel="noopener"
           hidden
-          class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px sm:w-auto"
+          class:list={[btn('primary', 'lg'), 'mt-7 w-full sm:w-auto']}
         >
           S'inscrire à l'événement
           <svg
@@ -127,7 +125,7 @@ import PageShell from '../layouts/PageShell.astro'
               id="agenda-trigger"
               aria-haspopup="true"
               aria-expanded="false"
-              class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:text-brand-700 hover:ring-brand-300"
+              class={btn('outline', 'sm')}
             >
               <svg
                 class="h-4 w-4 text-brand-600"
@@ -167,7 +165,7 @@ import PageShell from '../layouts/PageShell.astro'
             href="#"
             target="_blank"
             rel="noopener"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-[13px] font-semibold text-white transition hover:brightness-95 active:translate-y-px"
+            class={btn('whatsapp', 'sm')}
           >
             <svg
               viewBox="0 0 24 24"
@@ -180,11 +178,7 @@ import PageShell from '../layouts/PageShell.astro'
             >
             Partager
           </a>
-          <button
-            id="copy"
-            type="button"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:ring-brand-300 hover:text-brand-700"
-          >
+          <button id="copy" type="button" class={btn('outline', 'sm')}>
             <span id="copy-label">Copier le lien</span>
           </button>
         </div>
@@ -395,6 +389,12 @@ import PageShell from '../layouts/PageShell.astro'
           ev.contact
         document.getElementById('contact-cell')!.classList.remove('hidden')
       }
+      // Le grid 2 colonnes ne vaut que si les deux cellules sont visibles,
+      // sinon la colonne vide laisse une demi-carte beige.
+      const metaEl = document.getElementById('meta') as HTMLElement
+      const cells = Number(Boolean(ev.price)) + Number(Boolean(ev.contact))
+      metaEl.classList.toggle('sm:grid-cols-2', cells === 2)
+      metaEl.hidden = cells === 0
 
       if (ev.registration_url && /^https?:\/\//i.test(ev.registration_url)) {
         const reg = document.getElementById('register') as HTMLAnchorElement

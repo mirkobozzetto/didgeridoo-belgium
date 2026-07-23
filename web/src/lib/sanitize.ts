@@ -11,6 +11,15 @@ export const ALLOWED_TAGS = new Set([
   'A',
 ])
 
+export function stripHtml(s: string): string {
+  return s
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export function sanitize(html: string): string {
   const doc = new DOMParser().parseFromString(html, 'text/html')
   const walk = (node: Element) => {

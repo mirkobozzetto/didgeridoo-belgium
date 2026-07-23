@@ -1,0 +1,201 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
+import { btn } from '../lib/button-styles'
+---
+
+<Layout title="Petites annonces — Didgeridoo Belgique">
+  <PageShell width="4xl" nav>
+    <section class="py-7">
+      <p
+        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+      >
+        Annonces
+      </p>
+      <h1
+        class="balance mt-1.5 text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-stone-900"
+      >
+        Petites annonces
+      </h1>
+      <p
+        class="pretty mt-2 max-w-prose text-[14px] leading-[1.7] text-stone-600"
+      >
+        Instruments, cours, artisanat et covoiturages de la communauté
+        didgeridoo en Belgique.
+      </p>
+    </section>
+
+    <div id="filters" class="flex flex-wrap gap-2 pb-6"></div>
+
+    <div id="state" class="py-10 text-center text-[14px] text-stone-400">
+      Chargement…
+    </div>
+    <div
+      id="empty"
+      hidden
+      class="rounded-2xl border border-dashed border-stone-300 bg-white/60 px-6 py-12 text-center"
+    >
+      <p class="text-[15px] font-semibold text-stone-700">
+        Aucune annonce dans cette catégorie pour l'instant
+      </p>
+      <p class="pretty mx-auto mt-1.5 max-w-sm text-[13px] text-stone-500">
+        Tu as un instrument à vendre, un cours ou un covoiturage à proposer ?
+      </p>
+      <a href="/proposer-annonce" class:list={[btn('primary', 'md'), 'mt-5']}>
+        Proposer une annonce
+      </a>
+    </div>
+
+    <div id="grid" hidden class="grid gap-4 sm:grid-cols-2"></div>
+
+    <p class="mt-10 text-center text-[12px] text-stone-400">
+      Quelque chose à vendre ou à proposer ?
+      <a
+        href="/proposer-annonce"
+        class="font-semibold text-brand-600 hover:text-brand-700"
+        >Publie ton annonce</a
+      >
+    </p>
+  </PageShell>
+
+  <script>
+    import { API_BASE } from '../lib/pb'
+    import { stripHtml } from '../lib/sanitize'
+    import {
+      ANNONCE_CATEGORIES,
+      annonceCategoryLabel,
+      annonceFirstPhotoUrl,
+      type AnnonceRecord,
+    } from '../lib/annonces'
+
+    const filtersEl = document.getElementById('filters') as HTMLDivElement
+    const stateEl = document.getElementById('state') as HTMLDivElement
+    const emptyEl = document.getElementById('empty') as HTMLDivElement
+    const gridEl = document.getElementById('grid') as HTMLDivElement
+
+    let activeCategory = ''
+    let all: AnnonceRecord[] = []
+
+    const chipBase =
+      'rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition'
+    const chipIdle = `${chipBase} bg-white text-stone-600 ring-1 ring-inset ring-stone-900/10 hover:text-brand-700 hover:ring-brand-300`
+    const chipActive = `${chipBase} bg-stone-900 text-white`
+
+    function card(ann: AnnonceRecord): HTMLAnchorElement {
+      const a = document.createElement('a')
+      a.href = `/annonce?id=${ann.id}`
+      a.className =
+        'group flex gap-4 rounded-2xl bg-white p-3.5 ring-1 ring-stone-900/5 shadow-card transition hover:shadow-card-hover hover:ring-brand-200'
+
+      const thumb = document.createElement('div')
+      thumb.className =
+        'relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-brand-100 ring-1 ring-inset ring-stone-900/5 sm:h-28 sm:w-28'
+      const img = document.createElement('img')
+      const src = annonceFirstPhotoUrl(ann, '300x300')
+      img.src = src ?? '/didge-placeholder.webp'
+      img.alt = src ? `Photo : ${ann.title}` : ''
+      img.loading = 'lazy'
+      img.className = 'h-full w-full object-cover'
+      thumb.appendChild(img)
+
+      const body = document.createElement('div')
+      body.className = 'flex min-w-0 flex-col justify-center gap-1 py-1'
+
+      const catLine = document.createElement('p')
+      catLine.className =
+        'text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-600'
+      catLine.textContent = annonceCategoryLabel(ann.category)
+      body.appendChild(catLine)
+
+      const title = document.createElement('h3')
+      title.className =
+        'truncate text-[16px] font-bold leading-snug tracking-tight text-stone-900'
+      title.textContent = ann.title
+      body.appendChild(title)
+
+      const excerpt = ann.description ? stripHtml(ann.description) : ''
+      if (excerpt) {
+        const desc = document.createElement('p')
+        desc.className =
+          'line-clamp-2 text-[12.5px] leading-relaxed text-stone-500'
+        desc.textContent = excerpt
+        body.appendChild(desc)
+      }
+
+      if (ann.price) {
+        const price = document.createElement('p')
+        price.className = 'text-[13.5px] font-semibold text-stone-900'
+        price.textContent = ann.price
+        body.appendChild(price)
+      }
+
+      a.append(thumb, body)
+      return a
+    }
+
+    function renderFilters() {
+      const chips: Array<{ key: string; label: string }> = [
+        { key: '', label: 'Toutes' },
+        ...Object.entries(ANNONCE_CATEGORIES).map(([key, label]) => ({
+          key,
+          label,
+        })),
+      ]
+      for (const chip of chips) {
+        const btn = document.createElement('button')
+        btn.type = 'button'
+        btn.className = chip.key === activeCategory ? chipActive : chipIdle
+        btn.textContent = chip.label
+        btn.addEventListener('click', () => {
+          activeCategory = chip.key
+          for (const [i, el] of Array.from(filtersEl.children).entries()) {
+            el.className =
+              chips[i].key === activeCategory ? chipActive : chipIdle
+          }
+          renderList()
+        })
+        filtersEl.appendChild(btn)
+      }
+    }
+
+    function renderList() {
+      const items = activeCategory
+        ? all.filter((a) => a.category === activeCategory)
+        : all
+      gridEl.replaceChildren()
+      if (!items.length) {
+        gridEl.hidden = true
+        emptyEl.hidden = false
+        return
+      }
+      emptyEl.hidden = true
+      gridEl.hidden = false
+      for (const ann of items) gridEl.appendChild(card(ann))
+    }
+
+    function nowUtcFilter(): string {
+      return new Date().toISOString().slice(0, 19).replace('T', ' ')
+    }
+
+    async function load() {
+      const filter = encodeURIComponent(
+        `(status='published' && expires_at > '${nowUtcFilter()}')`,
+      )
+      const url = `${API_BASE}/pb/api/collections/annonces/records?filter=${filter}&sort=-published_at&perPage=200`
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const json = (await res.json()) as { items?: AnnonceRecord[] }
+        all = json.items ?? []
+        stateEl.hidden = true
+        renderList()
+      } catch {
+        stateEl.textContent =
+          'Impossible de charger les annonces. Réessaie dans un instant.'
+      }
+    }
+
+    renderFilters()
+    load()
+  </script>
+</Layout>

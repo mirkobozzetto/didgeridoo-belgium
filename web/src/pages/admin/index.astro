@@ -15,8 +15,20 @@ import ModerationBoard from '../../components/admin/ModerationBoard.astro'
 
   <script>
     import { initAdminSession } from '../../lib/admin-session'
-    import { fetchEvents, patchStatus } from '../../lib/admin-api'
+    import {
+      fetchEvents,
+      fetchRecords,
+      patchStatus,
+      patchRecord,
+      deleteRecord,
+    } from '../../lib/admin-api'
     import { pendingCard, compactRow, inlineError } from '../../lib/admin-cards'
+    import {
+      annoncePendingCard,
+      reportedRow,
+      type ReportedGroup,
+    } from '../../lib/admin-annonces-cards'
+    import type { AnnonceRecord } from '../../lib/annonces'
 
     const board = document.getElementById('board') as HTMLDivElement
     const pendingState = document.getElementById(
@@ -134,10 +146,130 @@ import ModerationBoard from '../../components/admin/ModerationBoard.astro'
       }
     }
 
+    const annPendingState = document.getElementById(
+      'ann-pending-state',
+    ) as HTMLDivElement
+    const annPendingList = document.getElementById(
+      'ann-pending-list',
+    ) as HTMLDivElement
+    const annReportedState = document.getElementById(
+      'ann-reported-state',
+    ) as HTMLDivElement
+    const annReportedList = document.getElementById(
+      'ann-reported-list',
+    ) as HTMLDivElement
+
+    const annonceActions = {
+      patch: (id: string, body: Record<string, string>) =>
+        patchRecord(session, 'annonces', id, body),
+      onChange: refreshAll,
+    }
+
+    async function loadAnnoncesPending() {
+      annPendingState.hidden = false
+      annPendingState.textContent = 'Chargement…'
+      annPendingList.replaceChildren()
+      try {
+        const items = await fetchRecords<AnnonceRecord>(
+          session,
+          'annonces',
+          "(status='pending')",
+          'created',
+          200,
+          'author',
+        )
+        if (!items) return
+        if (!items.length) {
+          annPendingState.textContent = 'Aucune annonce en attente.'
+          return
+        }
+        annPendingState.hidden = true
+        for (const ann of items)
+          annPendingList.appendChild(annoncePendingCard(ann, annonceActions))
+      } catch {
+        annPendingState.hidden = false
+        annPendingState.textContent = 'Impossible de charger les annonces.'
+      }
+    }
+
+    interface SignalementRecord {
+      id: string
+      reason: string
+      expand?: { annonce?: AnnonceRecord }
+    }
+
+    function groupReports(items: SignalementRecord[]): ReportedGroup[] {
+      const groups = new Map<string, ReportedGroup>()
+      for (const s of items) {
+        const ann = s.expand?.annonce
+        if (!ann || ann.status !== 'published') continue
+        let group = groups.get(ann.id)
+        if (!group) {
+          group = { annonce: ann, count: 0, reasons: [], signalementIds: [] }
+          groups.set(ann.id, group)
+        }
+        group.count += 1
+        if (s.reason) group.reasons.push(s.reason)
+        group.signalementIds.push(s.id)
+      }
+      return Array.from(groups.values()).sort((a, b) => b.count - a.count)
+    }
+
+    async function deleteReports(group: ReportedGroup): Promise<string | null> {
+      for (const sid of group.signalementIds) {
+        const err = await deleteRecord(session, 'signalements', sid)
+        if (err) return err
+      }
+      return null
+    }
+
+    const reportedActions = {
+      unpublish: async (group: ReportedGroup) => {
+        const err = await patchRecord(session, 'annonces', group.annonce.id, {
+          status: 'rejected',
+          rejection_reason: 'Annonce signalée par la communauté',
+        })
+        if (err) return err
+        return deleteReports(group)
+      },
+      ignore: deleteReports,
+      onChange: refreshAll,
+    }
+
+    async function loadAnnoncesReported() {
+      annReportedState.hidden = false
+      annReportedState.textContent = 'Chargement…'
+      annReportedList.replaceChildren()
+      try {
+        const items = await fetchRecords<SignalementRecord>(
+          session,
+          'signalements',
+          "id != ''",
+          '-created',
+          200,
+          'annonce',
+        )
+        if (!items) return
+        const groups = groupReports(items)
+        if (!groups.length) {
+          annReportedState.textContent = 'Aucun signalement.'
+          return
+        }
+        annReportedState.hidden = true
+        for (const group of groups)
+          annReportedList.appendChild(reportedRow(group, reportedActions))
+      } catch {
+        annReportedState.hidden = false
+        annReportedState.textContent = 'Impossible de charger les signalements.'
+      }
+    }
+
     function refreshAll() {
       loadPending()
       loadPublished()
       loadRejected()
+      loadAnnoncesPending()
+      loadAnnoncesReported()
     }
   </script>
 </Layout>

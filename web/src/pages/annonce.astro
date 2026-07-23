@@ -1,0 +1,261 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
+import { btn } from '../lib/button-styles'
+---
+
+<Layout title="Annonce — Didgeridoo Belgique">
+  <PageShell width="2xl" nav>
+    <p class="pt-7">
+      <a
+        href="/annonces"
+        class="text-[12px] font-semibold text-stone-400 transition-colors hover:text-brand-600"
+        >← Toutes les annonces</a
+      >
+    </p>
+
+    <div id="state" class="py-14 text-center text-[14px] text-stone-400">
+      Chargement…
+    </div>
+
+    <div
+      id="notfound"
+      hidden
+      class="my-10 rounded-2xl border border-dashed border-stone-300 bg-white/60 px-6 py-12 text-center"
+    >
+      <p class="text-[15px] font-semibold text-stone-700">
+        Cette annonce n'existe plus
+      </p>
+      <p class="pretty mx-auto mt-1.5 max-w-sm text-[13px] text-stone-500">
+        Elle a peut-être expiré ou été retirée.
+      </p>
+      <a href="/annonces" class:list={[btn('primary', 'md'), 'mt-5']}>
+        Voir les annonces
+      </a>
+    </div>
+
+    <article id="annonce" hidden class="my-6">
+      <div
+        class="relative overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-stone-900/5"
+      >
+        <span
+          class="pointer-events-none absolute inset-x-0 top-0 z-10 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+        ></span>
+        <div id="photos" class="flex flex-col"></div>
+        <div class="flex flex-col gap-4 p-6 sm:p-8">
+          <div>
+            <p
+              id="category"
+              class="text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-600"
+            >
+            </p>
+            <h1
+              id="title"
+              class="balance mt-1.5 text-[clamp(1.5rem,3.5vw,2rem)] font-extrabold leading-[1.15] tracking-[-0.02em] text-stone-900"
+            >
+            </h1>
+            <p id="meta" class="mt-1.5 text-[12.5px] text-stone-400"></p>
+          </div>
+
+          <p id="price" hidden class="text-[19px] font-bold text-stone-900"></p>
+
+          <div
+            id="description"
+            class="rte-desc pretty text-[14.5px] leading-relaxed text-stone-600"
+          >
+          </div>
+
+          <div
+            class="flex flex-wrap items-center gap-3 border-t border-stone-900/[0.06] pt-5"
+          >
+            <a id="contact" href="#" class={btn('primary', 'md')}>
+              Contacter par e-mail
+            </a>
+            <button
+              id="report"
+              type="button"
+              class="inline-flex items-center justify-center rounded-full px-3 py-2 text-[12.5px] font-medium text-stone-400 transition hover:text-red-600"
+            >
+              Signaler cette annonce
+            </button>
+          </div>
+
+          <div id="report-box" hidden class="flex flex-col gap-2">
+            <textarea
+              id="report-reason"
+              rows="2"
+              placeholder="Pourquoi cette annonce pose problème ? (facultatif)"
+              class="rounded-xl border border-stone-200 bg-stone-50 p-3 text-[14px] leading-relaxed text-stone-900 outline-none focus:border-brand-400"
+            ></textarea>
+            <button
+              id="report-confirm"
+              type="button"
+              class:list={[btn('dark', 'xs'), 'self-start']}
+            >
+              Envoyer le signalement
+            </button>
+          </div>
+          <p id="report-done" hidden class="text-[12.5px] text-stone-500">
+            Merci, ton signalement a été transmis.
+          </p>
+        </div>
+      </div>
+    </article>
+  </PageShell>
+
+  <script>
+    import { sanitize } from '../lib/sanitize'
+    import { API_BASE, fromPbDate } from '../lib/pb'
+    import {
+      annonceCategoryLabel,
+      annoncePhotoUrl,
+      type AnnonceRecord,
+    } from '../lib/annonces'
+
+    const stateEl = document.getElementById('state') as HTMLDivElement
+    const notfoundEl = document.getElementById('notfound') as HTMLDivElement
+    const articleEl = document.getElementById('annonce') as HTMLElement
+
+    const id = (new URLSearchParams(location.search).get('id') ?? '').replace(
+      /[^a-z0-9]/gi,
+      '',
+    )
+
+    function render(ann: AnnonceRecord) {
+      document.title = `${ann.title} — Didgeridoo Belgique`
+      ;(document.getElementById('category') as HTMLElement).textContent =
+        annonceCategoryLabel(ann.category)
+      ;(document.getElementById('title') as HTMLElement).textContent = ann.title
+      ;(document.getElementById('meta') as HTMLElement).textContent =
+        ann.published_at ? `Publiée le ${fromPbDate(ann.published_at)}` : ''
+
+      if (ann.price) {
+        const price = document.getElementById('price') as HTMLElement
+        price.hidden = false
+        price.textContent = ann.price
+      }
+
+      ;(document.getElementById('description') as HTMLElement).innerHTML =
+        sanitize(ann.description ?? '')
+
+      const photosEl = document.getElementById('photos') as HTMLDivElement
+      for (const photo of ann.photos ?? []) {
+        const img = document.createElement('img')
+        img.src = annoncePhotoUrl(ann, photo)
+        img.alt = `Photo : ${ann.title}`
+        img.loading = 'lazy'
+        img.className = 'max-h-[28rem] w-full object-cover'
+        photosEl.appendChild(img)
+      }
+
+      const contact = document.getElementById('contact') as HTMLAnchorElement
+      contact.href = `mailto:${ann.contact_email}?subject=${encodeURIComponent(
+        `Annonce : ${ann.title}`,
+      )}`
+
+      stateEl.hidden = true
+      articleEl.hidden = false
+    }
+
+    const reportBtn = document.getElementById('report') as HTMLButtonElement
+    const reportBox = document.getElementById('report-box') as HTMLDivElement
+    const reportReason = document.getElementById(
+      'report-reason',
+    ) as HTMLTextAreaElement
+    const reportConfirm = document.getElementById(
+      'report-confirm',
+    ) as HTMLButtonElement
+    const reportDone = document.getElementById('report-done') as HTMLElement
+
+    const REPORTED_KEY = `annonce_signalee_${id}`
+
+    function markReported() {
+      reportBtn.hidden = true
+      reportBox.hidden = true
+      reportDone.hidden = false
+    }
+
+    if (localStorage.getItem(REPORTED_KEY)) {
+      reportBtn.hidden = true
+      reportDone.hidden = false
+    }
+
+    reportBtn.addEventListener('click', () => {
+      reportBox.hidden = !reportBox.hidden
+      if (!reportBox.hidden) reportReason.focus()
+    })
+
+    reportConfirm.addEventListener('click', async () => {
+      reportConfirm.disabled = true
+      try {
+        const res = await fetch(
+          `${API_BASE}/pb/api/collections/signalements/records`,
+          {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              annonce: id,
+              reason: reportReason.value.trim().slice(0, 300),
+            }),
+          },
+        )
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        localStorage.setItem(REPORTED_KEY, '1')
+        markReported()
+      } catch {
+        reportConfirm.disabled = false
+        reportConfirm.textContent = 'Échec, réessaie'
+      }
+    })
+
+    async function load() {
+      if (!id) {
+        stateEl.hidden = true
+        notfoundEl.hidden = false
+        return
+      }
+      try {
+        const res = await fetch(
+          `${API_BASE}/pb/api/collections/annonces/records/${id}`,
+        )
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        render((await res.json()) as AnnonceRecord)
+      } catch {
+        stateEl.hidden = true
+        notfoundEl.hidden = false
+      }
+    }
+
+    load()
+  </script>
+
+  <style is:global>
+    .rte-desc p {
+      margin: 0 0 0.5rem;
+    }
+    .rte-desc p:last-child {
+      margin-bottom: 0;
+    }
+    .rte-desc ul {
+      list-style: disc;
+      padding-left: 1.3rem;
+      margin: 0 0 0.5rem;
+    }
+    .rte-desc ol {
+      list-style: decimal;
+      padding-left: 1.3rem;
+      margin: 0 0 0.5rem;
+    }
+    .rte-desc li {
+      margin: 0.1rem 0;
+    }
+    .rte-desc strong,
+    .rte-desc b {
+      font-weight: 700;
+    }
+    .rte-desc a {
+      color: var(--color-brand-600);
+      text-decoration: underline;
+    }
+  </style>
+</Layout>

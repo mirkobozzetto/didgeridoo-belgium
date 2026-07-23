@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
 import Brand from '../components/Brand.astro'
+import { btn } from '../lib/button-styles'
 ---
 
 <Layout title="Inscription confirmée — Didgeridoo Belgique">
@@ -49,7 +50,7 @@ import Brand from '../components/Brand.astro'
         href="#"
         target="_blank"
         rel="noopener"
-        class="mt-4 inline-flex w-full items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:brightness-95 active:translate-y-px"
+        class:list={[btn('whatsapp', 'lg'), 'mt-4 w-full']}
       >
         <svg
           viewBox="0 0 24 24"

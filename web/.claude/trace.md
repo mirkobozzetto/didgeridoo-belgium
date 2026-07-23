@@ -14,3 +14,5 @@ Newest entries at the bottom. `next` reads this to show what moved.
 - [web] 2026-07-23T00:54:20Z | done: edited 1 file | files: web/public/didge-placeholder.webp | status: wip
 - [chat] 2026-07-23T01:13:28Z | done: edited 5 files | files: .env.example, docker-compose.yml, server/src/newsletter.ts, server/src/cron.ts, web/src/pages/confirmation.astro | status: wip
 - [chat] 2026-07-23T01:14:24Z | done: edited 4 files | files: AGENTS.md, CLAUDE.md, web/.claude/.trace-state, web/.claude/trace.md | status: wip
+- [web] 2026-07-23T01:31:41Z | done: edited 14 files | files: web/src/components/AccountNav.astro, web/src/components/admin/ModerationBoard.astro, web/src/lib/admin-api.ts, web/src/lib/admin-cards.ts, web/src/lib/sanitize.ts, web/src/pages/admin/index.astro, web/src/pages/mes-propositions.astro, pb_hooks/annonces.pb.js, +6 more | status: wip
+- [chat] 2026-07-23T01:32:14Z | done: edited 4 files | files: AGENTS.md, CLAUDE.md, web/.claude/.trace-state, web/.claude/trace.md | status: wip

@@ -1,5 +1,6 @@
 import { API_BASE, fromPbDate } from './pb'
 import { sanitize } from './sanitize'
+import { btn } from './button-styles'
 
 export interface Organizer {
   name?: string
@@ -77,7 +78,7 @@ function sessionsRow(sessions: Session[]): HTMLDivElement {
   return row
 }
 
-function detailRow(label: string, value: string): HTMLDivElement {
+export function detailRow(label: string, value: string): HTMLDivElement {
   const row = document.createElement('div')
   row.className = 'flex flex-col'
   const l = document.createElement('span')
@@ -192,14 +193,12 @@ export function pendingCard(
 
   const approve = document.createElement('button')
   approve.type = 'button'
-  approve.className =
-    'inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px'
+  approve.className = btn('primary', 'xs')
   approve.textContent = 'Approuver'
 
   const rejectToggle = document.createElement('button')
   rejectToggle.type = 'button'
-  rejectToggle.className =
-    'inline-flex items-center justify-center rounded-xl bg-stone-100 px-4 py-2 text-[13px] font-semibold text-stone-700 transition hover:bg-stone-200 active:translate-y-px'
+  rejectToggle.className = btn('subtle', 'xs')
   rejectToggle.textContent = 'Refuser'
 
   actionsRow.append(approve, rejectToggle)
@@ -215,8 +214,7 @@ export function pendingCard(
     'rounded-xl border border-stone-200 bg-stone-50 p-3 text-[14px] leading-relaxed text-stone-900 outline-none focus:border-brand-400'
   const confirmReject = document.createElement('button')
   confirmReject.type = 'button'
-  confirmReject.className =
-    'self-start inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-red-700 active:translate-y-px'
+  confirmReject.className = `${btn('danger', 'xs')} self-start`
   confirmReject.textContent = 'Confirmer le refus'
   rejectBox.append(reasonInput, confirmReject)
   body.appendChild(rejectBox)
@@ -284,16 +282,15 @@ export function compactRow(
   }
 
   if (action) {
-    const btn = document.createElement('button')
-    btn.type = 'button'
-    btn.className =
-      'shrink-0 inline-flex items-center justify-center rounded-lg bg-stone-100 px-3 py-1.5 text-[12px] font-semibold text-stone-700 transition hover:bg-stone-200 active:translate-y-px'
-    btn.textContent = action.label
-    btn.addEventListener('click', async () => {
-      btn.disabled = true
+    const actionBtn = document.createElement('button')
+    actionBtn.type = 'button'
+    actionBtn.className = `${btn('subtle', 'xs')} shrink-0`
+    actionBtn.textContent = action.label
+    actionBtn.addEventListener('click', async () => {
+      actionBtn.disabled = true
       await action.run()
     })
-    row.appendChild(btn)
+    row.appendChild(actionBtn)
   }
 
   return row

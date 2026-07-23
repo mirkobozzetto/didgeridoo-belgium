@@ -2,6 +2,7 @@
 // Form de connexion superuser partagé par les pages admin.
 // Les ids (login, identity, password, login-error) sont le contrat
 // qu'utilisent les scripts métier des pages.
+import { btn } from '../lib/button-styles'
 ---
 
 <form
@@ -38,10 +39,7 @@
       class="mt-1 bg-transparent text-[15px] text-stone-900 outline-none"
     />
   </label>
-  <button
-    type="submit"
-    class="mt-2 inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-4 py-2.5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
-  >
+  <button type="submit" class:list={[btn('primary', 'sm'), 'mt-2']}>
     Se connecter
   </button>
   <p id="login-error" hidden class="text-[13px] text-red-600"></p>

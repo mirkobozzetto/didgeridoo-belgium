@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
-import { didgeridooIllustration } from '../lib/didgeridoo'
+import { btn } from '../lib/button-styles'
 ---
 
 <Layout
@@ -79,9 +79,13 @@ import { didgeridooIllustration } from '../lib/didgeridoo'
         hidden
         class="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-card ring-1 ring-stone-900/5"
       >
-        <div class="mx-auto mb-4 h-16 w-16 opacity-70">
-          <Fragment set:html={didgeridooIllustration} />
-        </div>
+        <img
+          src="/didge-placeholder.webp"
+          alt=""
+          width="112"
+          height="112"
+          class="mx-auto mb-4 h-28 w-28 rounded-2xl object-cover ring-1 ring-inset ring-stone-900/5"
+        />
         <p class="text-[15px] font-semibold text-stone-900">
           Aucun événement à venir pour l'instant
         </p>
@@ -91,10 +95,7 @@ import { didgeridooIllustration } from '../lib/didgeridoo'
           Rejoins la communauté sur la page d'accueil pour être prévenu dès
           qu'un stage ou un concert est annoncé.
         </p>
-        <a
-          href="/"
-          class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
-        >
+        <a href="/" class:list={[btn('primary', 'md'), 'mt-5']}>
           Rejoindre la communauté
         </a>
       </div>

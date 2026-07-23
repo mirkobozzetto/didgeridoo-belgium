@@ -1,5 +1,6 @@
 ---
 // Markup de l'éditeur de newsletter. La logique vit dans le script de la page.
+import { btn } from '../../lib/button-styles'
 ---
 
 <div id="editor" hidden class="flex flex-col gap-6">
@@ -45,18 +46,10 @@
   </div>
 
   <div class="flex flex-wrap gap-3">
-    <button
-      id="preview-btn"
-      type="button"
-      class="inline-flex items-center justify-center rounded-xl bg-stone-900 px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-stone-700 active:translate-y-px"
-    >
+    <button id="preview-btn" type="button" class={btn('dark', 'md')}>
       Aperçu
     </button>
-    <button
-      id="send-btn"
-      type="button"
-      class="inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-2.5 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
-    >
+    <button id="send-btn" type="button" class={btn('primary', 'md')}>
       Envoyer à la liste
     </button>
   </div>

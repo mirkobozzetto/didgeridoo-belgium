@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import { btn } from '../lib/button-styles'
 ---
 
 <Layout>
@@ -23,11 +24,12 @@ import Layout from '../layouts/Layout.astro'
             Calendrier des événements&nbsp;→
           </a>
           <a
-            href="/connexion"
-            class="rounded-full border border-stone-900/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-600 transition-colors hover:border-brand-600 hover:text-brand-600"
+            href="/annonces"
+            class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
           >
-            Se connecter
+            Annonces&nbsp;→
           </a>
+          <a href="/connexion" class={btn('outline', 'xs')}> Se connecter </a>
         </nav>
         <span
           class="inline-flex items-center gap-2 rounded-full bg-brand-100 py-1 pl-2.5 pr-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-200/70"
@@ -202,7 +204,7 @@ import Layout from '../layouts/Layout.astro'
 
             <button
               type="submit"
-              class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
+              class:list={[btn('primary', 'lg'), 'group/btn mt-1 w-full']}
             >
               Je rejoins la communauté
               <svg
@@ -285,10 +287,7 @@ import Layout from '../layouts/Layout.astro'
         <p class="text-[15px] font-semibold text-stone-900">
           Les prochains stages et concerts arrivent ici
         </p>
-        <a
-          href="/calendrier"
-          class="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3 text-[14px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px"
-        >
+        <a href="/calendrier" class:list={[btn('primary', 'md'), 'mt-5']}>
           Voir le calendrier
         </a>
       </div>
@@ -304,10 +303,7 @@ import Layout from '../layouts/Layout.astro'
       <div id="ev-grid" hidden class="mt-8 grid gap-4 sm:grid-cols-2"></div>
 
       <div id="ev-cta" hidden class="mt-10 text-center">
-        <a
-          href="/calendrier"
-          class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:text-brand-700 hover:ring-brand-300 active:translate-y-px"
-        >
+        <a href="/calendrier" class={btn('outline', 'md')}>
           Voir tout le calendrier
           <svg
             viewBox="0 0 20 20"

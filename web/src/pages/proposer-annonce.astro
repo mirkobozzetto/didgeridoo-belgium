@@ -1,0 +1,307 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
+import RichTextEditor from '../components/proposer/RichTextEditor.astro'
+import FieldLabel from '../components/ui/FieldLabel.astro'
+import { btn } from '../lib/button-styles'
+---
+
+<Layout title="Proposer une annonce — Didgeridoo Belgique">
+  <PageShell width="2xl" nav>
+    <section class="py-7">
+      <p
+        class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
+      >
+        Annonces
+      </p>
+      <h1
+        id="heading"
+        class="balance mt-1.5 text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-stone-900"
+      >
+        Une annonce à publier
+      </h1>
+      <p
+        class="pretty mt-2 max-w-prose text-[14px] leading-[1.7] text-stone-600"
+      >
+        Vente d'instrument, cours, artisanat ou covoiturage vers un stage.
+        L'annonce passe en relecture, puis reste en ligne 45 jours.
+      </p>
+    </section>
+
+    <div
+      class="relative overflow-hidden rounded-2xl bg-white p-6 shadow-card ring-1 ring-stone-900/5 sm:p-8"
+    >
+      <span
+        class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+      ></span>
+
+      <form id="annonce-form" novalidate class="flex flex-col gap-5">
+        <label class="field block pb-2">
+          <FieldLabel block required>Titre</FieldLabel>
+          <input
+            type="text"
+            name="title"
+            required
+            placeholder="Didgeridoo en eucalyptus, clé de ré"
+            class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+          />
+        </label>
+
+        <label class="field block pb-2">
+          <FieldLabel block required>Catégorie</FieldLabel>
+          <select
+            name="category"
+            required
+            class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 focus:outline-none"
+          >
+            <option value="" disabled selected>Choisis une catégorie</option>
+            <option value="vente_instrument">Vente d'instrument</option>
+            <option value="cours">Cours</option>
+            <option value="artisanat">Artisanat</option>
+            <option value="covoiturage">Covoiturage</option>
+            <option value="autre">Autre</option>
+          </select>
+        </label>
+
+        <RichTextEditor />
+
+        <label class="block">
+          <FieldLabel block hint="jpeg, png ou webp, 3 max, 5 Mo chacune"
+            >Photos</FieldLabel
+          >
+          <input
+            type="file"
+            name="photos"
+            multiple
+            accept="image/jpeg,image/png,image/webp"
+            class="mt-2 block w-full text-[13px] text-stone-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-100 file:px-4 file:py-2 file:text-[13px] file:font-semibold file:text-brand-700 hover:file:bg-brand-200"
+          />
+          <span
+            id="current-photos"
+            hidden
+            class="mt-1.5 block text-[12px] text-stone-400"></span>
+        </label>
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <label class="field block pb-2">
+            <FieldLabel block hint="facultatif">Prix</FieldLabel>
+            <input
+              type="text"
+              name="price"
+              placeholder="350 €, à discuter, gratuit..."
+              class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+            />
+          </label>
+          <label class="field block pb-2">
+            <FieldLabel block required>E-mail de contact</FieldLabel>
+            <input
+              type="email"
+              name="contact_email"
+              required
+              placeholder="toi@exemple.be"
+              class="mt-1.5 w-full bg-transparent text-[15px] text-stone-900 placeholder-stone-300 focus:outline-none"
+            />
+          </label>
+        </div>
+
+        <p class="text-[12px] leading-relaxed text-stone-400">
+          L'e-mail de contact est affiché publiquement sur l'annonce pour que
+          les intéressés t'écrivent directement.
+        </p>
+
+        <div class="hp" aria-hidden="true">
+          <label
+            >Site web<input
+              type="text"
+              name="website"
+              tabindex="-1"
+              autocomplete="off"
+            /></label
+          >
+        </div>
+
+        <div
+          id="error"
+          hidden
+          class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-700"
+        >
+        </div>
+
+        <button
+          type="submit"
+          class:list={[btn('primary', 'lg'), 'group/btn mt-1 w-full']}
+        >
+          <span id="submit-label">Envoyer en relecture</span>
+        </button>
+      </form>
+    </div>
+  </PageShell>
+
+  <script>
+    import { pb, getAuth } from '../lib/pb'
+    import { sanitize } from '../lib/sanitize'
+
+    const auth = getAuth()
+    if (!auth) location.replace('/connexion')
+
+    const MAX_BYTES = 5 * 1024 * 1024
+    const MAX_PHOTOS = 3
+    const ALLOWED = ['image/jpeg', 'image/png', 'image/webp']
+
+    const params = new URLSearchParams(location.search)
+    const editId = params.get('id')
+
+    const form = document.getElementById('annonce-form') as HTMLFormElement
+    const errorEl = document.getElementById('error') as HTMLDivElement
+    const heading = document.getElementById('heading') as HTMLHeadingElement
+    const submitLabel = document.getElementById(
+      'submit-label',
+    ) as HTMLSpanElement
+    const currentPhotos = document.getElementById(
+      'current-photos',
+    ) as HTMLSpanElement
+    const button = form.querySelector(
+      'button[type="submit"]',
+    ) as HTMLButtonElement
+    const editor = document.getElementById(
+      'description-editor',
+    ) as HTMLDivElement
+
+    function showError(msg: string) {
+      errorEl.hidden = false
+      errorEl.textContent = msg
+      errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    interface AnnonceRecord {
+      status: string
+      title: string
+      category: string
+      description: string
+      price: string
+      contact_email: string
+      photos: string[]
+    }
+
+    async function loadForEdit(id: string) {
+      try {
+        const rec = await pb<AnnonceRecord>(
+          `/api/collections/annonces/records/${id}`,
+          { auth: true },
+        )
+        if (rec.status !== 'rejected' && rec.status !== 'pending') {
+          location.replace('/mes-propositions')
+          return
+        }
+        if (rec.status === 'rejected') {
+          heading.textContent = "Corriger l'annonce"
+          submitLabel.textContent = 'Renvoyer en relecture'
+        } else {
+          heading.textContent = "Modifier l'annonce"
+          submitLabel.textContent = 'Enregistrer les modifications'
+        }
+        const set = (name: string, value: string) => {
+          const el = form.elements.namedItem(name) as
+            HTMLInputElement | HTMLSelectElement | null
+          if (el) el.value = value ?? ''
+        }
+        set('title', rec.title)
+        set('category', rec.category)
+        set('price', rec.price)
+        set('contact_email', rec.contact_email)
+        editor.innerHTML = sanitize(rec.description ?? '')
+        if (rec.photos?.length) {
+          currentPhotos.hidden = false
+          currentPhotos.textContent =
+            "Photos actuelles conservées si tu n'en choisis pas de nouvelles."
+        }
+      } catch {
+        location.replace('/mes-propositions')
+      }
+    }
+
+    if (editId) loadForEdit(editId)
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const data = new FormData(form)
+      if (String(data.get('website') ?? '')) return
+
+      const title = String(data.get('title') ?? '').trim()
+      const category = String(data.get('category') ?? '')
+      const contactEmail = String(data.get('contact_email') ?? '').trim()
+      const description = editor.innerText.trim()
+      const photos = (data.getAll('photos') as File[]).filter((f) => f.size > 0)
+
+      if (!title || !category || !description || !contactEmail) {
+        showError(
+          'Titre, catégorie, description et e-mail de contact sont obligatoires.',
+        )
+        return
+      }
+      if (photos.length > MAX_PHOTOS) {
+        showError('3 photos maximum.')
+        return
+      }
+      for (const photo of photos) {
+        if (!ALLOWED.includes(photo.type)) {
+          showError('Les photos doivent être au format jpeg, png ou webp.')
+          return
+        }
+        if (photo.size > MAX_BYTES) {
+          showError('Chaque photo doit faire moins de 5 Mo.')
+          return
+        }
+      }
+
+      const payload = new FormData()
+      payload.set('title', title)
+      payload.set('category', category)
+      payload.set('description', sanitize(editor.innerHTML))
+      payload.set('price', String(data.get('price') ?? '').trim())
+      payload.set('contact_email', contactEmail)
+      payload.set('status', 'pending')
+      for (const photo of photos) payload.append('photos', photo)
+
+      button.disabled = true
+      errorEl.hidden = true
+
+      try {
+        if (editId) {
+          await pb(`/api/collections/annonces/records/${editId}`, {
+            method: 'PATCH',
+            body: payload,
+            auth: true,
+          })
+        } else {
+          payload.set('author', auth!.record.id)
+          await pb('/api/collections/annonces/records', {
+            method: 'POST',
+            body: payload,
+            auth: true,
+          })
+        }
+        window.location.replace('/mes-propositions')
+      } catch (err) {
+        const status = (err as { status?: number })?.status
+        if (status === 401 || status === 403) {
+          showError('Session expirée. Reconnecte-toi.')
+        } else {
+          showError("L'envoi a échoué. Vérifie les champs et réessaie.")
+        }
+      } finally {
+        button.disabled = false
+      }
+    })
+  </script>
+
+  <style>
+    .hp {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+  </style>
+</Layout>

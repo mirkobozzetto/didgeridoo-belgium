@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
 import Brand from '../components/Brand.astro'
+import { btn } from '../lib/button-styles'
 ---
 
 <Layout title="Espace organisateur — Didgeridoo Belgique">
@@ -104,7 +105,7 @@ import Brand from '../components/Brand.astro'
 
         <button
           type="submit"
-          class="group/btn mt-1 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-brand-500 to-brand-600 px-5 py-3.5 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] transition hover:from-brand-600 hover:to-brand-700 active:translate-y-px disabled:opacity-60"
+          class:list={[btn('primary', 'lg'), 'group/btn mt-1 w-full']}
         >
           <span id="submit-label">Se connecter</span>
         </button>
