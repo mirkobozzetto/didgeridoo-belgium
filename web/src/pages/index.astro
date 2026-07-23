@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import Brand from '../components/Brand.astro'
 import AccountMenu from '../components/AccountMenu.astro'
+import MobileNavMenu from '../components/MobileNavMenu.astro'
 import AuthNavSync from '../components/AuthNavSync.astro'
 import { AUTH_KEY, ADMIN_AUTH_KEY } from '../lib/pb'
 import { btn } from '../lib/button-styles'
@@ -40,8 +41,11 @@ const jsonLd = JSON.stringify([
         class="relative flex items-center justify-between border-b border-stone-900/10 pb-4"
       >
         <Brand />
-        <nav class="hidden items-center gap-5 md:flex">
-          <div data-nav-links class="relative flex items-center gap-6">
+        <nav class="flex items-center gap-3 md:gap-5">
+          <div
+            data-nav-links
+            class="relative hidden items-center gap-6 md:flex"
+          >
             <a
               href="/calendrier"
               class="whitespace-nowrap text-[13px] font-semibold text-stone-500 transition-colors hover:text-stone-900"
@@ -59,8 +63,13 @@ const jsonLd = JSON.stringify([
               class="absolute -bottom-[17px] h-[2.5px] rounded-full bg-brand-600 opacity-0 transition-[left,width] duration-[280ms] ease-[cubic-bezier(.4,0,.2,1)]"
               aria-hidden="true"></span>
           </div>
-          <span data-signed-out hidden>
-            <a href="/connexion" class={btn('outline', 'xs')}> Se connecter </a>
+          <span data-signed-out hidden class="flex items-center">
+            <MobileNavMenu class="md:hidden" />
+            <span class="hidden md:block">
+              <a href="/connexion" class={btn('outline', 'xs')}>
+                Se connecter
+              </a>
+            </span>
           </span>
           <span data-signed-in hidden class="flex items-center">
             <AccountMenu />
@@ -163,7 +172,7 @@ const jsonLd = JSON.stringify([
           </h2>
 
           <div class="mt-5 flex flex-col gap-4">
-            <div class="grid grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <label class="field block pb-2">
                 <span
                   class="block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-stone-400"
@@ -329,7 +338,12 @@ const jsonLd = JSON.stringify([
         Impossible de charger les événements. Réessaie dans un instant.
       </div>
 
-      <div id="ev-grid" hidden class="mt-8 grid gap-4 sm:grid-cols-2"></div>
+      <div
+        id="ev-grid"
+        hidden
+        class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2"
+      >
+      </div>
 
       <div id="ev-cta" hidden class="mt-10 text-center">
         <a href="/calendrier" class={btn('outline', 'md')}>
@@ -518,7 +532,7 @@ const jsonLd = JSON.stringify([
 
       const thumb = document.createElement('div')
       thumb.className =
-        'relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-brand-100 ring-1 ring-inset ring-stone-900/5 sm:h-28 sm:w-28'
+        'relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-brand-100 ring-1 ring-inset ring-stone-900/5 sm:h-28 sm:w-28'
       const img = document.createElement('img')
       const src = posterUrl(ev)
       img.src = src ?? '/didge-placeholder.webp'
@@ -551,7 +565,7 @@ const jsonLd = JSON.stringify([
 
       const title = document.createElement('h3')
       title.className =
-        'truncate text-[16px] font-bold leading-snug tracking-tight text-stone-900'
+        'truncate text-[15px] font-bold leading-snug tracking-tight text-stone-900 sm:text-[16px]'
       title.textContent = ev.title
 
       body.appendChild(title)

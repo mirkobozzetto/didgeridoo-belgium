@@ -1,6 +1,7 @@
 ---
 import Brand from './Brand.astro'
 import AccountMenu from './AccountMenu.astro'
+import MobileNavMenu from './MobileNavMenu.astro'
 import AuthNavSync from './AuthNavSync.astro'
 import { AUTH_KEY, ADMIN_AUTH_KEY } from '../lib/pb'
 import { btn } from '../lib/button-styles'
@@ -50,11 +51,14 @@ const navLink =
     </nav>
   </div>
 
-  <nav data-signed-out hidden class="flex shrink-0 items-center gap-3">
-    <a
-      href="/connexion"
-      class:list={[btn('outline', 'xs'), 'whitespace-nowrap']}>Se connecter</a
-    >
+  <nav data-signed-out hidden class="flex shrink-0 items-center">
+    <MobileNavMenu class="@min-[42rem]:hidden" />
+    <span class="hidden @min-[42rem]:block">
+      <a
+        href="/connexion"
+        class:list={[btn('outline', 'xs'), 'whitespace-nowrap']}>Se connecter</a
+      >
+    </span>
   </nav>
 
   <nav data-signed-in hidden class="flex shrink-0 items-center gap-3">

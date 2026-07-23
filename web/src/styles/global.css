@@ -29,6 +29,27 @@
 html {
   -webkit-text-size-adjust: 100%;
 }
+/* Aucun scroll horizontal de page : tout débordement se clippe au viewport. */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* Popovers [data-menu] : apparition douce quand hidden saute. */
+[data-menu]:not([hidden]) {
+  transform-origin: top right;
+  animation: menu-in 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 /* Tailwind v4 met cursor: default sur les boutons : on rétablit le
    feedback cliquable partout, une fois pour toutes. */
@@ -52,6 +73,14 @@ a {
 
 .balance {
   text-wrap: balance;
+}
+/* Barres scrollables au pouce : le scroll marche, la barre ne se voit pas */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 .pretty {
   text-wrap: pretty;

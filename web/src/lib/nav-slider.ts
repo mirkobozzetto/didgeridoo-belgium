@@ -27,16 +27,22 @@ export function initNavSlider(nav: HTMLElement): void {
     else slider.style.opacity = '0'
   }
 
-  for (const link of links) {
-    link.addEventListener('mouseenter', () => moveTo(link))
+  // Tactile : pas de survol, le trait reste posé sur l'actif.
+  const canHover = window.matchMedia('(hover: hover)').matches
+  if (canHover) {
+    for (const link of links) {
+      link.addEventListener('mouseenter', () => moveTo(link))
+    }
+    nav.addEventListener('mouseleave', rest)
   }
-  nav.addEventListener('mouseleave', rest)
   window.addEventListener('resize', rest)
 
   // Pose initiale sans glissement visible.
   slider.style.transition = 'none'
   rest()
-  requestAnimationFrame(() => {
-    slider.style.transition = ''
-  })
+  if (canHover) {
+    requestAnimationFrame(() => {
+      slider.style.transition = ''
+    })
+  }
 }

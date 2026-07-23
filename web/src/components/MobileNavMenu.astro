@@ -1,0 +1,46 @@
+---
+// Menu de navigation mobile (visiteur non connecté) : burger qui ouvre le
+// même popover que le menu compte - liens du site puis Se connecter.
+// Toggle initialisé par le script d'AccountMenu ([data-menu-trigger]).
+import { menuItem } from '../lib/menu-styles'
+
+interface Props {
+  class?: string
+}
+const { class: className } = Astro.props
+
+const item = menuItem()
+---
+
+<div class:list={['relative', className]}>
+  <button
+    type="button"
+    data-menu-trigger
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-label="Menu"
+    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-white to-stone-50 shadow-[inset_0_1px_0_rgb(255_255_255/0.9),inset_0_0_0_1px_rgb(28_25_23/0.10),0_1px_2px_rgb(28_25_23/0.06)] transition-colors active:translate-y-px"
+  >
+    <svg
+      class="h-5 w-5 text-brand-600"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 5.25A.75.75 0 0 1 2.75 9.25h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 10Zm0 5.25a.75.75 0 0 1 .75-.75h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"
+        clip-rule="evenodd"></path>
+    </svg>
+  </button>
+  <div
+    data-menu
+    hidden
+    class="absolute right-0 top-full z-20 mt-2 w-60 max-w-[calc(100vw-16px)] overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
+  >
+    <a href="/calendrier" data-menu-key="calendrier" class={item}>Calendrier</a>
+    <a href="/annonces" data-menu-key="annonces" class={item}>Annonces</a>
+    <div class="my-1.5 border-t border-stone-900/10"></div>
+    <a href="/connexion" class={item}>Se connecter</a>
+  </div>
+</div>

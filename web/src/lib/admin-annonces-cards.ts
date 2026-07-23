@@ -224,7 +224,8 @@ export function reportedRow(
   }
 
   const actionsRow = document.createElement('div')
-  actionsRow.className = 'pt-1'
+  actionsRow.className =
+    'no-scrollbar max-w-full overflow-x-auto overscroll-x-contain pt-1'
 
   const pill = document.createElement('div')
   pill.className = pillGroup()

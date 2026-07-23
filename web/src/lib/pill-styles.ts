@@ -20,7 +20,7 @@ export function pillGroup(): string {
 }
 
 const SEGMENT_BASE =
-  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-5 py-2.5 ' +
+  'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2.5 sm:px-5 ' +
   'first:rounded-l-full last:rounded-r-full ' +
   'transition-[background,color,box-shadow] duration-200 disabled:opacity-60'
 

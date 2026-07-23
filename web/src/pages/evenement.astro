@@ -5,6 +5,7 @@ import { btn } from '../lib/button-styles'
 import PillGroup from '../components/ui/PillGroup.astro'
 import PillSegment from '../components/ui/PillSegment.astro'
 import PillSep from '../components/ui/PillSep.astro'
+import { menuItem } from '../lib/menu-styles'
 ---
 
 <Layout
@@ -139,7 +140,8 @@ import PillSep from '../components/ui/PillSep.astro'
                     d="M5.75 3a.75.75 0 0 0-.75.75V4h-.5A2.5 2.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 15.5 4H15v-.25a.75.75 0 0 0-1.5 0V4h-7v-.25A.75.75 0 0 0 5.75 3ZM3.5 8h13v6.5a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V8Z"
                   ></path>
                 </svg>
-                Ajouter à mon agenda
+                <span class="sm:hidden">Agenda</span>
+                <span class="hidden sm:inline">Ajouter à mon agenda</span>
               </PillSegment>
               <PillSep />
               <PillSegment
@@ -162,27 +164,27 @@ import PillSep from '../components/ui/PillSep.astro'
               </PillSegment>
               <PillSep />
               <PillSegment id="copy" class="flex-1 sm:flex-none">
-                <span id="copy-label">Copier le lien</span>
+                <span id="copy-label"
+                  ><span class="sm:hidden">Copier</span><span
+                    class="hidden sm:inline">Copier le lien</span
+                  ></span
+                >
               </PillSegment>
             </PillGroup>
             <div
               id="agenda-menu"
+              data-menu
               hidden
-              class="absolute left-0 top-full z-20 mt-2 w-56 overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
+              class="absolute left-0 top-full z-20 mt-2 w-60 max-w-[calc(100vw-16px)] overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
             >
               <a
                 id="agenda-google"
                 href="#"
                 target="_blank"
                 rel="noopener"
-                class="block w-full px-4 py-2 text-left text-[13px] text-stone-600 transition-colors hover:bg-stone-50 hover:text-stone-900"
-                >Google Agenda</a
+                class={menuItem()}>Google Agenda</a
               >
-              <a
-                id="agenda-apple"
-                href="#"
-                class="block w-full px-4 py-2 text-left text-[13px] text-stone-600 transition-colors hover:bg-stone-50 hover:text-stone-900"
-                >Apple Calendar</a
+              <a id="agenda-apple" href="#" class={menuItem()}>Apple Calendar</a
               >
             </div>
           </div>

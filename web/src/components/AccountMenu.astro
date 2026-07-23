@@ -1,7 +1,8 @@
 ---
 // Pilule compte + dropdown : tout ce qui concerne le compte connecté.
-const menuItem =
-  'block w-full px-4 py-2 text-left text-[13px] text-stone-600 transition-colors hover:bg-stone-50 hover:text-stone-900'
+import { menuItem as menuItemStyle } from '../lib/menu-styles'
+
+const menuItem = menuItemStyle()
 ---
 
 <button
@@ -41,11 +42,12 @@ const menuItem =
 <div
   data-menu
   hidden
-  class="absolute right-0 top-full z-20 mt-2 w-56 overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
+  class="absolute right-0 top-full z-20 mt-2 w-60 max-w-[calc(100vw-16px)] overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
 >
   <a href="/calendrier" data-menu-key="calendrier" class={menuItem}
     >Calendrier</a
   >
+  <a href="/annonces" data-menu-key="annonces" class={menuItem}>Annonces</a>
   <a href="/mes-propositions" data-menu-key="mes-propositions" class={menuItem}
     >Mes propositions</a
   >
@@ -66,18 +68,23 @@ const menuItem =
 
 <script>
   import { clearAllAuth } from '../lib/pb'
+  import { initMenuToggle } from '../lib/menu-toggle'
 
   // Astro bundle ce script même quand PageShell ne rend pas la nav :
   // sans garde, le crash bloque tous les autres scripts de la page.
   const root = document.querySelector<HTMLElement>('[data-account-nav]')
   if (root) {
-    const trigger = root.querySelector(
+    // Tous les popovers du header : menu compte + burger mobile.
+    for (const trigger of root.querySelectorAll<HTMLElement>(
       '[data-menu-trigger]',
-    ) as HTMLButtonElement
-    const menu = root.querySelector('[data-menu]') as HTMLElement
+    )) {
+      const menu =
+        trigger.parentElement?.querySelector<HTMLElement>('[data-menu]')
+      if (menu) initMenuToggle(trigger, menu)
+    }
 
     const activeKey = root.dataset.active
-    const current = menu.querySelector<HTMLElement>(
+    const current = root.querySelector<HTMLElement>(
       `[data-menu-key="${activeKey}"]`,
     )
     if (current) {
@@ -86,26 +93,12 @@ const menuItem =
       current.setAttribute('aria-current', 'page')
     }
 
-    const close = () => {
-      menu.hidden = true
-      trigger.setAttribute('aria-expanded', 'false')
+    const logout = root.querySelector<HTMLButtonElement>('[data-logout]')
+    if (logout) {
+      logout.addEventListener('click', () => {
+        clearAllAuth()
+        location.href = '/'
+      })
     }
-    trigger.addEventListener('click', (e) => {
-      e.stopPropagation()
-      menu.hidden = !menu.hidden
-      trigger.setAttribute('aria-expanded', String(!menu.hidden))
-    })
-    document.addEventListener('click', (e) => {
-      if (!menu.hidden && !menu.contains(e.target as Node)) close()
-    })
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') close()
-    })
-    ;(
-      root.querySelector('[data-logout]') as HTMLButtonElement
-    ).addEventListener('click', () => {
-      clearAllAuth()
-      location.href = '/'
-    })
   }
 </script>
