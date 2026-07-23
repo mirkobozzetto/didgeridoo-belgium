@@ -150,6 +150,10 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
       '[data-filter-pill]',
     ) as HTMLDivElement
     filterPill.className = pillGroup()
+    // Classes posées dès l'init : à vide, applyFilter ne tourne jamais.
+    for (const chip of Array.from(filterPill.querySelectorAll('button'))) {
+      chip.className = chip.dataset.cat === 'all' ? CHIP_ON : CHIP_OFF
+    }
     for (const chip of Array.from(filterPill.querySelectorAll('button')).slice(
       1,
     )) {
