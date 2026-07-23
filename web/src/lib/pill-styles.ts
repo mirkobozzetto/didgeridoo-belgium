@@ -37,6 +37,16 @@ export function pillSegment(kind: PillSegmentKind = 'default'): string {
   return `${SEGMENT_BASE} ${SEGMENT_HOVER[kind]}`
 }
 
+// Segment ACTION au bout d'une barre de filtres : le CTA du site fondu
+// dans la pilule. Couleur pleine + relief = jamais confondu avec un filtre.
+export function pillSegmentCta(): string {
+  return (
+    `${SEGMENT_BASE} bg-gradient-to-b from-brand-500 to-brand-600 text-white ` +
+    'shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(0_0_0/0.1)] ' +
+    'hover:from-brand-600 hover:to-brand-700'
+  )
+}
+
 // État sélectionné (filtres, onglets) : le style du hover, en permanent.
 export function pillSegmentActive(): string {
   return (

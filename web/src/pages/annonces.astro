@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
-import { btn } from '../lib/button-styles'
 ---
 
 <Layout title="Petites annonces — Didgeridoo Belgique">
@@ -41,23 +40,12 @@ import { btn } from '../lib/button-styles'
         Aucune annonce dans cette catégorie pour l'instant
       </p>
       <p class="pretty mx-auto mt-1.5 max-w-sm text-[13px] text-stone-500">
-        Tu as un instrument à vendre, un cours ou un covoiturage à proposer ?
+        Tu as un instrument à vendre, un cours ou un covoiturage à proposer ? Le
+        bouton est juste au-dessus.
       </p>
-      <a href="/proposer-annonce" class:list={[btn('primary', 'md'), 'mt-5']}>
-        Proposer une annonce
-      </a>
     </div>
 
     <div id="grid" hidden class="grid gap-4 sm:grid-cols-2"></div>
-
-    <p class="mt-10 text-center text-[12px] text-stone-400">
-      Quelque chose à vendre ou à proposer ?
-      <a
-        href="/proposer-annonce"
-        class="font-semibold text-brand-600 hover:text-brand-700"
-        >Publie ton annonce</a
-      >
-    </p>
   </PageShell>
 
   <script>
@@ -73,6 +61,7 @@ import { btn } from '../lib/button-styles'
       pillGroup,
       pillSegment,
       pillSegmentActive,
+      pillSegmentCta,
       pillSep,
     } from '../lib/pill-styles'
 
@@ -173,6 +162,16 @@ import { btn } from '../lib/button-styles'
         buttons.push(btn)
         pill.appendChild(btn)
       })
+
+      const sep = document.createElement('span')
+      sep.className = pillSep()
+      sep.setAttribute('aria-hidden', 'true')
+      const cta = document.createElement('a')
+      cta.href = '/proposer-annonce'
+      cta.className = pillSegmentCta()
+      cta.textContent = '+ Proposer une annonce'
+      pill.append(sep, cta)
+
       filtersEl.appendChild(pill)
     }
 

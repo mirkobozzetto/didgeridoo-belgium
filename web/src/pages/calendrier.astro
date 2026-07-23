@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro'
 import PageShell from '../layouts/PageShell.astro'
 import { btn } from '../lib/button-styles'
+import { pillSegmentCta, pillSep } from '../lib/pill-styles'
 ---
 
 <Layout
@@ -9,9 +10,7 @@ import { btn } from '../lib/button-styles'
   description="Tous les stages, concerts et rencontres à venir de la communauté belge du didgeridoo."
 >
   <PageShell width="4xl" nav active="calendrier">
-    <section
-      class="flex flex-wrap items-end justify-between gap-x-6 gap-y-5 py-7 sm:py-9"
-    >
+    <section class="py-7">
       <div>
         <p
           class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
@@ -19,44 +18,16 @@ import { btn } from '../lib/button-styles'
           Agenda
         </p>
         <h1
-          class="balance mt-1.5 text-[clamp(2rem,4.5vw,3rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-stone-900"
+          class="balance mt-1.5 text-[clamp(1.8rem,4vw,2.4rem)] font-extrabold leading-[1.1] tracking-[-0.03em] text-stone-900"
         >
           Les prochains événements
         </h1>
         <p
-          class="pretty mt-3 max-w-xl text-[14px] leading-[1.7] text-stone-600"
+          class="pretty mt-2 max-w-prose text-[14px] leading-[1.7] text-stone-600"
         >
           Stages, concerts et rencontres autour du didgeridoo et de la culture
           aborigène, en Belgique.
         </p>
-      </div>
-
-      <div id="ics" hidden class="relative">
-        <button
-          type="button"
-          id="ics-trigger"
-          aria-haspopup="true"
-          aria-expanded="false"
-          class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[12.5px] font-semibold text-stone-600 ring-1 ring-inset ring-stone-900/10 transition hover:text-brand-700 hover:ring-brand-300"
-        >
-          <svg
-            class="h-4 w-4 text-brand-600"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M5.75 3a.75.75 0 0 0-.75.75V4h-.5A2.5 2.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 15.5 4H15v-.25a.75.75 0 0 0-1.5 0V4h-7v-.25A.75.75 0 0 0 5.75 3ZM3.5 8h13v6.5a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V8Z"
-            ></path>
-          </svg>
-          Ajouter à mon agenda
-        </button>
-        <div
-          id="ics-menu"
-          hidden
-          class="absolute right-0 top-full z-20 mt-2 w-64 overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
-        >
-        </div>
       </div>
     </section>
 
@@ -69,6 +40,10 @@ import { btn } from '../lib/button-styles'
           <button type="button" data-cat="festival">Festival</button>
           <button type="button" data-cat="rencontre">Rencontre</button>
           <button type="button" data-cat="autre">Autre</button>
+          <span class={pillSep()} aria-hidden="true"></span>
+          <a href="/proposer" class={pillSegmentCta()}>
+            + Proposer un événement
+          </a>
         </div>
       </div>
 
@@ -119,8 +94,7 @@ import { btn } from '../lib/button-styles'
       <div class="flex items-center justify-between">
         <span>Didgeridoo &amp; culture aborigène</span>
         <span
-          ><a href="/" class="text-brand-600 hover:text-brand-700"
-            >Accueil</a
+          ><a href="/" class="text-brand-600 hover:text-brand-700">Accueil</a
           ></span
         >
       </div>
@@ -190,7 +164,6 @@ import { btn } from '../lib/button-styles'
     const errorEl = document.getElementById('error') as HTMLDivElement
     const listEl = document.getElementById('list') as HTMLDivElement
     const filtersEl = document.getElementById('filters') as HTMLDivElement
-    const icsEl = document.getElementById('ics') as HTMLDivElement
 
     let allEvents: EventRecord[] = []
 
@@ -360,113 +333,16 @@ import { btn } from '../lib/button-styles'
       )
     }
 
-    // Menu « Ajouter à mon agenda » : liens profonds un-clic par plateforme,
-    // copie du lien en dernier recours (le cid= Google échoue parfois).
-    function setupIcsMenu() {
-      const trigger = document.getElementById(
-        'ics-trigger',
-      ) as HTMLButtonElement
-      const menu = document.getElementById('ics-menu') as HTMLDivElement
-
-      const icsUrl = `${location.host}/calendrier.ics`
-      const webcal = `webcal://${icsUrl}`
-      const item =
-        'block w-full px-4 py-2 text-left text-[13px] text-stone-600 transition-colors hover:bg-stone-50 hover:text-stone-900'
-
-      const apple = { label: 'Apple Calendar', href: webcal, blank: false }
-      const google = {
-        label: 'Google Agenda',
-        href: `https://calendar.google.com/calendar/r?cid=${webcal}`,
-        blank: true,
-      }
-      const outlook = {
-        label: 'Outlook',
-        href: `https://outlook.live.com/calendar/0/addfromweb?url=${webcal}&name=${encodeURIComponent('Didgeridoo Belgique')}`,
-        blank: true,
-      }
-      const isApple = /Mac|iPhone|iPad/.test(navigator.userAgent)
-      const links = isApple
-        ? [apple, google, outlook]
-        : [google, apple, outlook]
-
-      for (const l of links) {
-        const a = document.createElement('a')
-        a.href = l.href
-        a.textContent = l.label
-        a.className = item
-        if (l.blank) {
-          a.target = '_blank'
-          a.rel = 'noopener'
-        }
-        menu.appendChild(a)
-      }
-
-      const sep = document.createElement('div')
-      sep.className = 'my-1.5 border-t border-stone-900/10'
-      menu.appendChild(sep)
-
-      const copy = document.createElement('button')
-      copy.type = 'button'
-      copy.textContent = 'Copier le lien'
-      copy.className = `${item} text-stone-400`
-      const copyUrl = `https://${icsUrl}`
-      // clipboard.writeText peut rester pendu (permission) : timeout + repli
-      // execCommand, puis feedback dans tous les cas.
-      const fallbackCopy = () => {
-        const ta = document.createElement('textarea')
-        ta.value = copyUrl
-        ta.setAttribute('readonly', '')
-        ta.style.position = 'fixed'
-        ta.style.opacity = '0'
-        document.body.appendChild(ta)
-        ta.select()
-        document.execCommand('copy')
-        ta.remove()
-      }
-      copy.addEventListener('click', async () => {
-        try {
-          await Promise.race([
-            navigator.clipboard.writeText(copyUrl),
-            new Promise((_, reject) => setTimeout(reject, 400)),
-          ])
-        } catch {
-          fallbackCopy()
-        }
-        copy.textContent = 'Lien copié'
-        setTimeout(() => {
-          copy.textContent = 'Copier le lien'
-        }, 2000)
-      })
-      menu.appendChild(copy)
-
-      const close = () => {
-        menu.hidden = true
-        trigger.setAttribute('aria-expanded', 'false')
-      }
-      trigger.addEventListener('click', (e) => {
-        e.stopPropagation()
-        menu.hidden = !menu.hidden
-        trigger.setAttribute('aria-expanded', String(!menu.hidden))
-      })
-      document.addEventListener('click', (e) => {
-        if (!menu.hidden && !menu.contains(e.target as Node)) close()
-      })
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close()
-      })
-    }
-
     function render(events: EventRecord[]) {
       loadingEl.hidden = true
+      // La barre reste visible même à vide : le CTA « Proposer » y vit.
+      filtersEl.hidden = false
       if (events.length === 0) {
         emptyEl.hidden = false
         return
       }
 
       allEvents = events
-      filtersEl.hidden = false
-      icsEl.hidden = false
-      setupIcsMenu()
       for (const chip of Array.from(filtersEl.querySelectorAll('button'))) {
         chip.addEventListener('click', () =>
           applyFilter(chip.dataset.cat ?? 'all'),
