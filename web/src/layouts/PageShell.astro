@@ -6,7 +6,12 @@ interface Props {
   center?: boolean
   nav?: boolean
   active?:
-    'calendrier' | 'proposer' | 'mes-propositions' | 'admin' | 'newsletter'
+    | 'calendrier'
+    | 'annonces'
+    | 'proposer'
+    | 'mes-propositions'
+    | 'admin'
+    | 'newsletter'
 }
 const { width, center = false, nav = false, active } = Astro.props
 

@@ -1,14 +1,23 @@
 ---
 import Brand from './Brand.astro'
 import AccountMenu from './AccountMenu.astro'
+import AuthNavSync from './AuthNavSync.astro'
 import { AUTH_KEY, ADMIN_AUTH_KEY } from '../lib/pb'
 import { btn } from '../lib/button-styles'
 
 interface Props {
   active?:
-    'calendrier' | 'proposer' | 'mes-propositions' | 'admin' | 'newsletter'
+    | 'calendrier'
+    | 'annonces'
+    | 'proposer'
+    | 'mes-propositions'
+    | 'admin'
+    | 'newsletter'
 }
 const { active } = Astro.props
+
+const navLink =
+  'whitespace-nowrap text-[13px] font-semibold text-stone-500 transition-colors hover:text-stone-900 aria-[current=page]:text-stone-900'
 ---
 
 <header
@@ -20,16 +29,25 @@ const { active } = Astro.props
 >
   <div class="flex min-w-0 items-center gap-5">
     <Brand />
-    <a
-      href="/calendrier"
-      class="hidden whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400 transition-colors hover:text-stone-600 @min-[42rem]:block"
-      >Calendrier</a
+    <nav
+      data-nav-links
+      class="relative hidden items-center gap-6 @min-[42rem]:flex"
     >
-    <a
-      href="/annonces"
-      class="hidden whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400 transition-colors hover:text-stone-600 @min-[42rem]:block"
-      >Annonces</a
-    >
+      <a
+        href="/calendrier"
+        aria-current={active === 'calendrier' ? 'page' : undefined}
+        class={navLink}>Calendrier</a
+      >
+      <a
+        href="/annonces"
+        aria-current={active === 'annonces' ? 'page' : undefined}
+        class={navLink}>Annonces</a
+      >
+      <span
+        data-nav-slider
+        class="absolute -bottom-[17px] h-[2.5px] rounded-full bg-brand-600 opacity-0 transition-[left,width] duration-[280ms] ease-[cubic-bezier(.4,0,.2,1)]"
+        aria-hidden="true"></span>
+    </nav>
   </div>
 
   <nav data-signed-out hidden class="flex shrink-0 items-center gap-3">
@@ -55,36 +73,11 @@ const { active } = Astro.props
   </nav>
 </header>
 
-<!-- Synchrone exprès : révèle l'état connecté AVANT le premier paint,
-     sinon le header "pop" à chaque navigation. -->
-<script is:inline>
-  ;(() => {
-    const root = document.querySelector('[data-account-nav]')
-    if (!root) return
-    const read = (key) => {
-      try {
-        const parsed = JSON.parse(localStorage.getItem(key) || 'null')
-        return parsed && parsed.token ? parsed : null
-      } catch {
-        return null
-      }
-    }
-    const organizer = read(root.dataset.authKey)
-    const admin = read(root.dataset.adminAuthKey)
-    const connected = organizer || admin
-    if (!connected) {
-      root.querySelector('[data-signed-out]').hidden = false
-      return
-    }
-    root.querySelector('[data-signed-in]').hidden = false
-    const who = connected.record.name || connected.record.email
-    root.querySelector('[data-account-name]').textContent = who
-    root.querySelector('[data-initial]').textContent = who
-      .charAt(0)
-      .toUpperCase()
-    if (admin) {
-      root.querySelector('[data-admin-badge]').hidden = false
-      root.querySelector('[data-admin-only]').hidden = false
-    }
-  })()
+<script>
+  import { initNavSlider } from '../lib/nav-slider'
+  document
+    .querySelectorAll<HTMLElement>('[data-nav-links]')
+    .forEach(initNavSlider)
 </script>
+
+<AuthNavSync />

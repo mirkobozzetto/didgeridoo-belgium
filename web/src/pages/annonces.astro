@@ -5,7 +5,7 @@ import { btn } from '../lib/button-styles'
 ---
 
 <Layout title="Petites annonces — Didgeridoo Belgique">
-  <PageShell width="4xl" nav>
+  <PageShell width="4xl" nav active="annonces">
     <section class="py-7">
       <p
         class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
@@ -25,7 +25,9 @@ import { btn } from '../lib/button-styles'
       </p>
     </section>
 
-    <div id="filters" class="flex flex-wrap gap-2 pb-6"></div>
+    <div class="pb-6">
+      <div id="filters" class="max-w-full overflow-x-auto"></div>
+    </div>
 
     <div id="state" class="py-10 text-center text-[14px] text-stone-400">
       Chargement…
@@ -67,6 +69,12 @@ import { btn } from '../lib/button-styles'
       annonceFirstPhotoUrl,
       type AnnonceRecord,
     } from '../lib/annonces'
+    import {
+      pillGroup,
+      pillSegment,
+      pillSegmentActive,
+      pillSep,
+    } from '../lib/pill-styles'
 
     const filtersEl = document.getElementById('filters') as HTMLDivElement
     const stateEl = document.getElementById('state') as HTMLDivElement
@@ -76,10 +84,8 @@ import { btn } from '../lib/button-styles'
     let activeCategory = ''
     let all: AnnonceRecord[] = []
 
-    const chipBase =
-      'rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition'
-    const chipIdle = `${chipBase} bg-white text-stone-600 ring-1 ring-inset ring-stone-900/10 hover:text-brand-700 hover:ring-brand-300`
-    const chipActive = `${chipBase} bg-stone-900 text-white`
+    const chipIdle = pillSegment()
+    const chipActive = pillSegmentActive()
 
     function card(ann: AnnonceRecord): HTMLAnchorElement {
       const a = document.createElement('a')
@@ -141,21 +147,33 @@ import { btn } from '../lib/button-styles'
           label,
         })),
       ]
-      for (const chip of chips) {
+      const pill = document.createElement('div')
+      pill.className = pillGroup()
+      const buttons: HTMLButtonElement[] = []
+      chips.forEach((chip, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span')
+          sep.className = pillSep()
+          sep.setAttribute('aria-hidden', 'true')
+          pill.appendChild(sep)
+        }
         const btn = document.createElement('button')
         btn.type = 'button'
+        btn.dataset.key = chip.key
         btn.className = chip.key === activeCategory ? chipActive : chipIdle
         btn.textContent = chip.label
         btn.addEventListener('click', () => {
           activeCategory = chip.key
-          for (const [i, el] of Array.from(filtersEl.children).entries()) {
-            el.className =
-              chips[i].key === activeCategory ? chipActive : chipIdle
+          for (const other of buttons) {
+            other.className =
+              other.dataset.key === activeCategory ? chipActive : chipIdle
           }
           renderList()
         })
-        filtersEl.appendChild(btn)
-      }
+        buttons.push(btn)
+        pill.appendChild(btn)
+      })
+      filtersEl.appendChild(pill)
     }
 
     function renderList() {

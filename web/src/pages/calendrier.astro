@@ -61,13 +61,15 @@ import { btn } from '../lib/button-styles'
     </section>
 
     <section id="events" class="min-h-0 flex-1 pb-10">
-      <div id="filters" hidden class="mb-8 flex flex-wrap gap-2">
-        <button type="button" data-cat="all">Tous</button>
-        <button type="button" data-cat="stage">Stage</button>
-        <button type="button" data-cat="concert">Concert</button>
-        <button type="button" data-cat="festival">Festival</button>
-        <button type="button" data-cat="rencontre">Rencontre</button>
-        <button type="button" data-cat="autre">Autre</button>
+      <div id="filters" hidden class="mb-8 max-w-full overflow-x-auto">
+        <div data-filter-pill>
+          <button type="button" data-cat="all">Tous</button>
+          <button type="button" data-cat="stage">Stage</button>
+          <button type="button" data-cat="concert">Concert</button>
+          <button type="button" data-cat="festival">Festival</button>
+          <button type="button" data-cat="rencontre">Rencontre</button>
+          <button type="button" data-cat="autre">Autre</button>
+        </div>
       </div>
 
       <div id="loading" class="py-12 text-center text-[13px] text-stone-400">
@@ -135,6 +137,13 @@ import { btn } from '../lib/button-styles'
   </PageShell>
 
   <script>
+    import {
+      pillGroup,
+      pillSegment,
+      pillSegmentActive,
+      pillSep,
+    } from '../lib/pill-styles'
+
     type Session = { date: string; start: string; end: string | null }
 
     type EventRecord = {
@@ -160,11 +169,21 @@ import { btn } from '../lib/button-styles'
       autre: 'Autre',
     }
 
-    const CHIP_BASE =
-      'rounded-full px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.1em] transition'
-    const CHIP_ON = 'bg-brand-600 text-white'
-    const CHIP_OFF =
-      'bg-white text-stone-500 ring-1 ring-inset ring-stone-900/10 hover:text-brand-700 hover:ring-brand-300'
+    const CHIP_ON = pillSegmentActive()
+    const CHIP_OFF = pillSegment()
+
+    const filterPill = document.querySelector(
+      '[data-filter-pill]',
+    ) as HTMLDivElement
+    filterPill.className = pillGroup()
+    for (const chip of Array.from(filterPill.querySelectorAll('button')).slice(
+      1,
+    )) {
+      const sep = document.createElement('span')
+      sep.className = pillSep()
+      sep.setAttribute('aria-hidden', 'true')
+      filterPill.insertBefore(sep, chip)
+    }
 
     const loadingEl = document.getElementById('loading') as HTMLDivElement
     const emptyEl = document.getElementById('empty') as HTMLDivElement
@@ -332,7 +351,7 @@ import { btn } from '../lib/button-styles'
     function applyFilter(cat: string) {
       for (const chip of Array.from(filtersEl.querySelectorAll('button'))) {
         const on = chip.dataset.cat === cat
-        chip.className = `${CHIP_BASE} ${on ? CHIP_ON : CHIP_OFF}`
+        chip.className = on ? CHIP_ON : CHIP_OFF
       }
       renderList(
         cat === 'all'

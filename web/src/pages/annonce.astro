@@ -5,7 +5,7 @@ import { btn } from '../lib/button-styles'
 ---
 
 <Layout title="Annonce — Didgeridoo Belgique">
-  <PageShell width="2xl" nav>
+  <PageShell width="2xl" nav active="annonces">
     <p class="pt-7">
       <a
         href="/annonces"
@@ -66,7 +66,7 @@ import { btn } from '../lib/button-styles'
           </div>
 
           <div
-            class="flex flex-wrap items-center gap-3 border-t border-stone-900/[0.06] pt-5"
+            class="flex flex-wrap items-center justify-between gap-3 border-t border-stone-900/[0.06] pt-5"
           >
             <a id="contact" href="#" class={btn('primary', 'md')}>
               Contacter par e-mail
@@ -74,9 +74,9 @@ import { btn } from '../lib/button-styles'
             <button
               id="report"
               type="button"
-              class="inline-flex items-center justify-center rounded-full px-3 py-2 text-[12.5px] font-medium text-stone-400 transition hover:text-red-600"
+              class="text-[12px] font-medium text-stone-400 transition-colors hover:text-red-600"
             >
-              Signaler cette annonce
+              Signaler
             </button>
           </div>
 

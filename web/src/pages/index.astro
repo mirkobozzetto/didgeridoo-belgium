@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import AccountMenu from '../components/AccountMenu.astro'
+import AuthNavSync from '../components/AuthNavSync.astro'
+import { AUTH_KEY, ADMIN_AUTH_KEY } from '../lib/pb'
 import { btn } from '../lib/button-styles'
 
 const SITE_URL = 'https://didgeridoo.top'
@@ -30,7 +33,10 @@ const jsonLd = JSON.stringify([
     <div class="flex min-h-[100dvh] flex-col py-4 lg:h-[100dvh]">
       <!-- Barre haute -->
       <header
-        class="flex items-center justify-between border-b border-stone-900/10 pb-4"
+        data-account-nav
+        data-auth-key={AUTH_KEY}
+        data-admin-auth-key={ADMIN_AUTH_KEY}
+        class="relative flex items-center justify-between border-b border-stone-900/10 pb-4"
       >
         <span class="text-[13.5px] font-extrabold tracking-[0.08em]">
           <span class="text-stone-900">didge</span><span
@@ -38,34 +44,39 @@ const jsonLd = JSON.stringify([
           ><span class="text-flag-red">.top</span>
         </span>
         <nav class="hidden items-center gap-5 md:flex">
-          <a
-            href="/calendrier"
-            class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
-          >
-            Calendrier des événements&nbsp;→
-          </a>
-          <a
-            href="/annonces"
-            class="text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600"
-          >
-            Annonces&nbsp;→
-          </a>
-          <a href="/connexion" class={btn('outline', 'xs')}> Se connecter </a>
-        </nav>
-        <span
-          class="inline-flex items-center gap-2 rounded-full bg-brand-100 py-1 pl-2.5 pr-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-700 ring-1 ring-inset ring-brand-200/70"
-        >
-          <span class="relative flex h-1.5 w-1.5">
+          <div data-nav-links class="relative flex items-center gap-6">
+            <a
+              href="/calendrier"
+              class="whitespace-nowrap text-[13px] font-semibold text-stone-500 transition-colors hover:text-stone-900"
+            >
+              Calendrier
+            </a>
+            <a
+              href="/annonces"
+              class="whitespace-nowrap text-[13px] font-semibold text-stone-500 transition-colors hover:text-stone-900"
+            >
+              Annonces
+            </a>
             <span
-              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-60"
-            ></span>
-            <span
-              class="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-600"
-            ></span>
+              data-nav-slider
+              class="absolute -bottom-[17px] h-[2.5px] rounded-full bg-brand-600 opacity-0 transition-[left,width] duration-[280ms] ease-[cubic-bezier(.4,0,.2,1)]"
+              aria-hidden="true"></span>
+          </div>
+          <span data-signed-out hidden>
+            <a href="/connexion" class={btn('outline', 'xs')}> Se connecter </a>
           </span>
-          🇧🇪 Communauté belge
-        </span>
+          <span data-signed-in hidden class="flex items-center">
+            <AccountMenu />
+          </span>
+        </nav>
+        <script>
+          import { initNavSlider } from '../lib/nav-slider'
+          document
+            .querySelectorAll<HTMLElement>('[data-nav-links]')
+            .forEach(initNavSlider)
+        </script>
       </header>
+      <AuthNavSync />
 
       <!-- Titre éditorial -->
       <section
@@ -356,7 +367,6 @@ const jsonLd = JSON.stringify([
     >
       <div class="flex items-center justify-between">
         <span>Didgeridoo &amp; culture aborigène</span>
-        <span>Belgique · <span class="text-brand-600">WhatsApp</span></span>
       </div>
       <div class="mt-2 flex items-center gap-3 normal-case tracking-normal">
         <a href="/confidentialite" class="hover:text-stone-600"

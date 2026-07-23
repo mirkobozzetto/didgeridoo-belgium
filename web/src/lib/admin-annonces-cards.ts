@@ -1,6 +1,7 @@
 import { fromPbDate } from './pb'
 import { sanitize } from './sanitize'
 import { btn } from './button-styles'
+import { pillGroup, pillSegment, pillSep } from './pill-styles'
 import { detailRow, inlineError } from './admin-cards'
 import {
   annonceCategoryLabel,
@@ -88,20 +89,27 @@ export function annoncePendingCard(
   }
 
   const actionsRow = document.createElement('div')
-  actionsRow.className =
-    'flex flex-wrap items-center gap-3 border-t border-stone-900/[0.06] pt-4'
+  actionsRow.className = 'border-t border-stone-900/[0.06] pt-4'
+
+  const group = document.createElement('div')
+  group.className = pillGroup()
 
   const approve = document.createElement('button')
   approve.type = 'button'
-  approve.className = btn('primary', 'xs')
+  approve.className = pillSegment()
   approve.textContent = 'Publier 45 jours'
+
+  const sep = document.createElement('span')
+  sep.className = pillSep()
+  sep.setAttribute('aria-hidden', 'true')
 
   const rejectToggle = document.createElement('button')
   rejectToggle.type = 'button'
-  rejectToggle.className = btn('subtle', 'xs')
+  rejectToggle.className = pillSegment()
   rejectToggle.textContent = 'Refuser'
 
-  actionsRow.append(approve, rejectToggle)
+  group.append(approve, sep, rejectToggle)
+  actionsRow.append(group)
   body.appendChild(actionsRow)
 
   const rejectBox = document.createElement('div')
@@ -216,23 +224,26 @@ export function reportedRow(
   }
 
   const actionsRow = document.createElement('div')
-  actionsRow.className = 'flex flex-wrap items-center gap-2 pt-1'
+  actionsRow.className = 'pt-1'
+
+  const pill = document.createElement('div')
+  pill.className = pillGroup()
 
   const view = document.createElement('a')
   view.href = `/annonce?id=${group.annonce.id}`
   view.target = '_blank'
   view.rel = 'noopener'
-  view.className = btn('outline', 'xs')
+  view.className = pillSegment()
   view.textContent = "Voir l'annonce"
 
   const unpublish = document.createElement('button')
   unpublish.type = 'button'
-  unpublish.className = btn('danger', 'xs')
+  unpublish.className = pillSegment('danger')
   unpublish.textContent = 'Dépublier'
 
   const ignore = document.createElement('button')
   ignore.type = 'button'
-  ignore.className = btn('subtle', 'xs')
+  ignore.className = pillSegment()
   ignore.textContent = 'Ignorer les signalements'
 
   unpublish.addEventListener('click', async () => {
@@ -257,7 +268,14 @@ export function reportedRow(
     actions.onChange()
   })
 
-  actionsRow.append(view, unpublish, ignore)
+  const mkSep = () => {
+    const sep = document.createElement('span')
+    sep.className = pillSep()
+    sep.setAttribute('aria-hidden', 'true')
+    return sep
+  }
+  pill.append(view, mkSep(), unpublish, mkSep(), ignore)
+  actionsRow.append(pill)
   row.appendChild(actionsRow)
   return row
 }

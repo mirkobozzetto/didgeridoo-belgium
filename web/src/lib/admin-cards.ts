@@ -1,6 +1,7 @@
 import { API_BASE, fromPbDate } from './pb'
 import { sanitize } from './sanitize'
 import { btn } from './button-styles'
+import { pillGroup, pillSegment, pillSep } from './pill-styles'
 
 export interface Organizer {
   name?: string
@@ -188,20 +189,27 @@ export function pendingCard(
   }
 
   const actionsRow = document.createElement('div')
-  actionsRow.className =
-    'flex flex-wrap items-center gap-3 border-t border-stone-900/[0.06] pt-4'
+  actionsRow.className = 'border-t border-stone-900/[0.06] pt-4'
+
+  const group = document.createElement('div')
+  group.className = pillGroup()
 
   const approve = document.createElement('button')
   approve.type = 'button'
-  approve.className = btn('primary', 'xs')
+  approve.className = pillSegment()
   approve.textContent = 'Approuver'
+
+  const sep = document.createElement('span')
+  sep.className = pillSep()
+  sep.setAttribute('aria-hidden', 'true')
 
   const rejectToggle = document.createElement('button')
   rejectToggle.type = 'button'
-  rejectToggle.className = btn('subtle', 'xs')
+  rejectToggle.className = pillSegment()
   rejectToggle.textContent = 'Refuser'
 
-  actionsRow.append(approve, rejectToggle)
+  group.append(approve, sep, rejectToggle)
+  actionsRow.append(group)
   body.appendChild(actionsRow)
 
   const rejectBox = document.createElement('div')

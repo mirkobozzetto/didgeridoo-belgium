@@ -1,0 +1,35 @@
+<!-- Synchrone exprès : révèle l'état connecté AVANT le premier paint,
+     sinon le header "pop" à chaque navigation. Partagé entre AccountNav
+     et le header de la landing. -->
+<script is:inline>
+  ;(() => {
+    const root = document.querySelector('[data-account-nav]')
+    if (!root) return
+    const read = (key) => {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(key) || 'null')
+        return parsed && parsed.token ? parsed : null
+      } catch {
+        return null
+      }
+    }
+    const organizer = read(root.dataset.authKey)
+    const admin = read(root.dataset.adminAuthKey)
+    const connected = organizer || admin
+    if (!connected) {
+      root.querySelector('[data-signed-out]').hidden = false
+      return
+    }
+    root.querySelector('[data-signed-in]').hidden = false
+    const who = connected.record.name || connected.record.email
+    root.querySelector('[data-account-name]').textContent = who
+    root.querySelector('[data-initial]').textContent = who
+      .charAt(0)
+      .toUpperCase()
+    if (admin) {
+      root.querySelector('[data-admin-badge]').hidden = false
+      const adminOnly = root.querySelector('[data-admin-only]')
+      if (adminOnly) adminOnly.hidden = false
+    }
+  })()
+</script>

@@ -9,22 +9,34 @@ const tabs = [
   { key: 'newsletter', href: '/admin/newsletter', label: 'Newsletter' },
 ] as const
 
-const activeClass =
-  '-mb-px border-b-2 border-brand-600 pb-2 text-[13px] font-semibold text-stone-900'
-const idleClass =
-  '-mb-px border-b-2 border-transparent pb-2 text-[13px] font-medium text-stone-400 transition-colors hover:text-stone-600'
+const tabClass =
+  'pb-2 text-[13px] font-medium text-stone-400 transition-colors hover:text-stone-900 aria-[current=page]:font-semibold aria-[current=page]:text-stone-900'
 ---
 
-<nav class="mt-5 flex gap-6 border-b border-stone-900/10">
+<nav
+  data-nav-links
+  class="relative mt-5 flex gap-6 border-b border-stone-900/10"
+>
   {
     tabs.map((tab) => (
       <a
         href={tab.href}
         aria-current={tab.key === active ? 'page' : undefined}
-        class={tab.key === active ? activeClass : idleClass}
+        class={tabClass}
       >
         {tab.label}
       </a>
     ))
   }
+  <span
+    data-nav-slider
+    class="absolute -bottom-px h-[2px] rounded-full bg-brand-600 opacity-0 transition-[left,width] duration-[280ms] ease-[cubic-bezier(.4,0,.2,1)]"
+    aria-hidden="true"></span>
 </nav>
+
+<script>
+  import { initNavSlider } from '../lib/nav-slider'
+  document
+    .querySelectorAll<HTMLElement>('[data-nav-links]')
+    .forEach(initNavSlider)
+</script>
