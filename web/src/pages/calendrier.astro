@@ -330,10 +330,18 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
         const on = chip.dataset.cat === cat
         chip.className = on ? CHIP_ON : CHIP_OFF
       }
+      // Calendrier vide : l'état actif change, la grande carte vide reste.
+      if (allEvents.length === 0) return
       renderList(
         cat === 'all'
           ? allEvents
           : allEvents.filter((ev) => ev.category === cat),
+      )
+    }
+
+    for (const chip of Array.from(filterPill.querySelectorAll('button'))) {
+      chip.addEventListener('click', () =>
+        applyFilter(chip.dataset.cat ?? 'all'),
       )
     }
 
@@ -347,11 +355,6 @@ import { pillSegmentCta, pillSep } from '../lib/pill-styles'
       }
 
       allEvents = events
-      for (const chip of Array.from(filtersEl.querySelectorAll('button'))) {
-        chip.addEventListener('click', () =>
-          applyFilter(chip.dataset.cat ?? 'all'),
-        )
-      }
       applyFilter('all')
     }
 
