@@ -3,6 +3,8 @@ import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
 import { serveStatic } from 'hono/bun'
 import { newsletter } from './newsletter'
+import { rateLimit } from './rate-limit'
+import { buildCalendar, buildVEvent, parseDate } from './ics'
 
 // ---------------------------------------------------------------------------
 // Configuration (via variables d'environnement)
@@ -19,11 +21,26 @@ const BREVO_API_URL =
 const POCKETBASE_URL = process.env.POCKETBASE_URL ?? 'http://localhost:8090'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// Anti-flood : fenêtres fixes par IP, en mémoire (un seul conteneur).
+const SUBSCRIBE_RATE = { limit: 5, windowMs: 10 * 60 * 1000 }
+const PB_WRITE_RATE = { limit: 30, windowMs: 5 * 60 * 1000 }
+
 const app = new Hono()
 
 app.use('*', logger())
 // CORS utile seulement si le front est servi depuis un autre domaine.
 app.use('/api/*', cors())
+
+app.use('/api/subscribe', rateLimit(SUBSCRIBE_RATE))
+// Les lectures du proxy Pocketbase restent libres, seules les écritures
+// (login, propositions, uploads) sont limitées.
+app.use(
+  '/pb/*',
+  rateLimit({
+    ...PB_WRITE_RATE,
+    skip: (c) => ['GET', 'HEAD', 'OPTIONS'].includes(c.req.method),
+  }),
+)
 
 // ---------------------------------------------------------------------------
 // Endpoint d'inscription : crée/actualise le contact dans Brevo + ajout liste
@@ -34,11 +51,18 @@ app.post('/api/subscribe', async (c) => {
     firstname?: string
     country?: string
     consent?: boolean
+    website?: string
   }
   try {
     body = await c.req.json()
   } catch {
     return c.json({ ok: false, error: 'invalid_json' }, 400)
+  }
+
+  // Honeypot : un humain ne voit pas ce champ, un bot le remplit.
+  // Drop silencieux, sans le lien WhatsApp.
+  if ((body.website ?? '').trim() !== '') {
+    return c.json({ ok: true, whatsapp: '' })
   }
 
   const email = (body.email ?? '').trim().toLowerCase()
@@ -155,11 +179,6 @@ function safeSlug(raw: string): string {
   return raw.replace(/[^a-z0-9-]/gi, '')
 }
 
-// Pocketbase renvoie "YYYY-MM-DD HH:mm:ss.sssZ" (espace), pas un ISO strict.
-function parseDate(raw: string): Date {
-  return new Date(raw.replace(' ', 'T'))
-}
-
 function requestOrigin(c: {
   req: { url: string; header: (n: string) => string | undefined }
 }): string {
@@ -209,67 +228,45 @@ app.get('/evenements/:file{.+\\.ics}', async (c) => {
   const ev = await fetchPublishedEvent(slug)
   if (!ev) return c.json({ ok: false, error: 'not_found' }, 404)
 
-  const toIcsDate = (d: Date) =>
-    d
-      .toISOString()
-      .replace(/[-:]/g, '')
-      .replace(/\.\d{3}/, '')
-  const start = toIcsDate(parseDate(ev.start))
-  const end = ev.end
-    ? toIcsDate(parseDate(ev.end))
-    : toIcsDate(new Date(parseDate(ev.start).getTime() + 2 * 60 * 60 * 1000))
-
-  const icsEscape = (s: string) =>
-    s
-      .replace(/\\/g, '\\\\')
-      .replace(/;/g, '\\;')
-      .replace(/,/g, '\\,')
-      .replace(/\r?\n/g, '\\n')
-
-  const foldLine = (line: string): string => {
-    const enc = new TextEncoder()
-    const bytes = enc.encode(line)
-    if (bytes.length <= 75) return line
-    const dec = new TextDecoder()
-    const out: string[] = []
-    let pos = 0
-    let limit = 75
-    while (pos < bytes.length) {
-      let cut = Math.min(pos + limit, bytes.length)
-      while (cut < bytes.length && (bytes[cut] & 0xc0) === 0x80) cut--
-      out.push(dec.decode(bytes.slice(pos, cut)))
-      pos = cut
-      limit = 74
-    }
-    return out.join('\r\n ')
-  }
-
-  const origin = requestOrigin(c)
-  const pageUrl = `${origin}/evenements/${ev.slug}`
-  const descSource = ev.description ? stripHtml(ev.description) : ''
-
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//didgeridoo-belgium//evenements//FR',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    `UID:${ev.id}@didgeridoo-belgium`,
-    `DTSTAMP:${toIcsDate(new Date())}`,
-    `DTSTART:${start}`,
-    `DTEND:${end}`,
-    `SUMMARY:${icsEscape(ev.title)}`,
-  ]
-  if (ev.location) lines.push(`LOCATION:${icsEscape(ev.location)}`)
-  if (descSource) lines.push(`DESCRIPTION:${icsEscape(descSource)}`)
-  lines.push(`URL:${pageUrl}`, 'END:VEVENT', 'END:VCALENDAR')
-
-  const body = lines.map(foldLine).join('\r\n') + '\r\n'
+  const body = buildCalendar([buildVEvent(ev, requestOrigin(c), stripHtml)])
   return new Response(body, {
     headers: {
       'content-type': 'text/calendar; charset=utf-8',
       'content-disposition': `attachment; filename="${ev.slug}.ics"`,
+    },
+  })
+})
+
+// Flux global : abonnable dans Google/Apple Calendar, tous les événements
+// publiés à venir.
+app.get('/calendrier.ics', async (c) => {
+  const nowPb = new Date().toISOString().replace('T', ' ').slice(0, 19)
+  const filter = encodeURIComponent(
+    `(status='published' && start >= '${nowPb}')`,
+  )
+  const url =
+    `${POCKETBASE_URL}/api/collections/events/records` +
+    `?filter=${filter}&sort=start&perPage=200`
+  let items: EventRecord[]
+  try {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`pocketbase ${res.status}`)
+    const json = (await res.json()) as { items?: EventRecord[] }
+    items = json.items ?? []
+  } catch (err) {
+    console.error('Flux ICS : lecture Pocketbase échouée:', err)
+    return c.json({ ok: false, error: 'pocketbase_unreachable' }, 502)
+  }
+
+  const origin = requestOrigin(c)
+  const body = buildCalendar(
+    items.map((ev) => buildVEvent(ev, origin, stripHtml)),
+    'Didgeridoo Belgique',
+  )
+  return new Response(body, {
+    headers: {
+      'content-type': 'text/calendar; charset=utf-8',
+      'content-disposition': 'inline; filename="calendrier.ics"',
     },
   })
 })

@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
+import Brand from '../components/Brand.astro'
+
+const h2 = 'mt-8 text-[15px] font-bold tracking-tight text-stone-900 first:mt-0'
+const p = 'pretty mt-2 text-[13.5px] leading-relaxed text-stone-600'
+---
+
+<Layout title="Mentions légales — Didgeridoo Belgique">
+  <PageShell width="2xl">
+    <header class="pb-8 pt-2 text-center">
+      <Brand />
+    </header>
+
+    <article
+      class="relative overflow-hidden rounded-2xl bg-white p-7 shadow-card ring-1 ring-stone-900/5 sm:p-9"
+    >
+      <span
+        class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+      ></span>
+
+      <h1 class="text-[21px] font-bold tracking-tight text-stone-900">
+        Mentions légales
+      </h1>
+
+      <h2 class={h2}>Éditeur</h2>
+      <p class={p}>
+        Site édité par Mirko Bozzetto, à titre non commercial, pour la
+        communauté didgeridoo et culture aborigène en Belgique.
+      </p>
+
+      <h2 class={h2}>Contact</h2>
+      <p class={p}>
+        <a
+          href="mailto:didgeridoo@mirko.re"
+          class="font-semibold text-brand-600 hover:text-brand-700"
+          >didgeridoo@mirko.re</a
+        >
+      </p>
+
+      <h2 class={h2}>Hébergement</h2>
+      <p class={p}>
+        Site hébergé sur un serveur privé situé dans l'Union européenne.
+      </p>
+
+      <h2 class={h2}>Données personnelles</h2>
+      <p class={p}>
+        Voir la
+        <a
+          href="/confidentialite"
+          class="font-semibold text-brand-600 hover:text-brand-700"
+          >politique de confidentialité</a
+        >.
+      </p>
+    </article>
+
+    <p class="mt-6 text-center text-[11.5px] text-stone-400">
+      <a href="/" class="hover:text-stone-600">Retour à l'accueil</a>
+      <span class="mx-2">·</span>
+      <a href="/confidentialite" class="hover:text-stone-600">Confidentialité</a
+      >
+    </p>
+  </PageShell>
+</Layout>

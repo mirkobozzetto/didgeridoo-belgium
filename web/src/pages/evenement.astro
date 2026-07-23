@@ -121,13 +121,47 @@ import PageShell from '../layouts/PageShell.astro'
         <div
           class="mt-8 flex flex-wrap items-center gap-3 border-t border-stone-900/10 pt-6"
         >
-          <a
-            id="agenda"
-            href="#"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:ring-brand-300 hover:text-brand-700"
-          >
-            🗓️ Ajouter à mon agenda
-          </a>
+          <div class="relative">
+            <button
+              type="button"
+              id="agenda-trigger"
+              aria-haspopup="true"
+              aria-expanded="false"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-[13px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:text-brand-700 hover:ring-brand-300"
+            >
+              <svg
+                class="h-4 w-4 text-brand-600"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  d="M5.75 3a.75.75 0 0 0-.75.75V4h-.5A2.5 2.5 0 0 0 2 6.5v8A2.5 2.5 0 0 0 4.5 17h11a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 15.5 4H15v-.25a.75.75 0 0 0-1.5 0V4h-7v-.25A.75.75 0 0 0 5.75 3ZM3.5 8h13v6.5a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V8Z"
+                ></path>
+              </svg>
+              Ajouter à mon agenda
+            </button>
+            <div
+              id="agenda-menu"
+              hidden
+              class="absolute left-0 top-full z-20 mt-2 w-56 overflow-hidden rounded-xl bg-white py-1.5 shadow-pop ring-1 ring-stone-900/5"
+            >
+              <a
+                id="agenda-google"
+                href="#"
+                target="_blank"
+                rel="noopener"
+                class="block w-full px-4 py-2 text-left text-[13px] text-stone-600 transition-colors hover:bg-stone-50 hover:text-stone-900"
+                >Google Agenda</a
+              >
+              <a
+                id="agenda-apple"
+                href="#"
+                class="block w-full px-4 py-2 text-left text-[13px] text-stone-600 transition-colors hover:bg-stone-50 hover:text-stone-900"
+                >Apple Calendar (.ics)</a
+              >
+            </div>
+          </div>
           <a
             id="share-wa"
             href="#"
@@ -369,8 +403,47 @@ import PageShell from '../layouts/PageShell.astro'
       }
 
       const pageUrl = location.href
-      const agenda = document.getElementById('agenda') as HTMLAnchorElement
-      agenda.href = `/evenements/${ev.slug}.ics`
+
+      // Menu agenda : lien Google pré-rempli + fichier .ics (Apple/Outlook).
+      const gDate = (iso: string) =>
+        iso.replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+      const startIso = parseDate(ev.start).toISOString()
+      const endIso = ev.end
+        ? parseDate(ev.end).toISOString()
+        : new Date(
+            parseDate(ev.start).getTime() + 2 * 60 * 60 * 1000,
+          ).toISOString()
+      const gUrl =
+        `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+        `&text=${encodeURIComponent(ev.title)}` +
+        `&dates=${gDate(startIso)}/${gDate(endIso)}` +
+        `&details=${encodeURIComponent(pageUrl)}` +
+        (ev.location ? `&location=${encodeURIComponent(ev.location)}` : '')
+      ;(document.getElementById('agenda-google') as HTMLAnchorElement).href =
+        gUrl
+      ;(document.getElementById('agenda-apple') as HTMLAnchorElement).href =
+        `/evenements/${ev.slug}.ics`
+
+      const agendaTrigger = document.getElementById(
+        'agenda-trigger',
+      ) as HTMLButtonElement
+      const agendaMenu = document.getElementById('agenda-menu') as HTMLElement
+      const closeAgenda = () => {
+        agendaMenu.hidden = true
+        agendaTrigger.setAttribute('aria-expanded', 'false')
+      }
+      agendaTrigger.addEventListener('click', (e) => {
+        e.stopPropagation()
+        agendaMenu.hidden = !agendaMenu.hidden
+        agendaTrigger.setAttribute('aria-expanded', String(!agendaMenu.hidden))
+      })
+      document.addEventListener('click', (e) => {
+        if (!agendaMenu.hidden && !agendaMenu.contains(e.target as Node))
+          closeAgenda()
+      })
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAgenda()
+      })
 
       const shareText = `${ev.title} — ${pageUrl}`
       const shareWa = document.getElementById('share-wa') as HTMLAnchorElement

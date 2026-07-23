@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /verifier-email
+Disallow: /reinitialiser
+Disallow: /mes-propositions
+
+Sitemap: https://didgeridoo.top/sitemap-index.xml

@@ -106,11 +106,20 @@ import Layout from '../layouts/Layout.astro'
         <form
           id="subscribe"
           novalidate
-          class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 transition-shadow duration-500 hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_32px_72px_-24px_rgb(28_25_23/0.5)] lg:absolute lg:top-1/2 lg:left-7 lg:mt-0 lg:-translate-y-1/2 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
+          class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 shadow-card ring-1 ring-stone-900/5 transition-shadow duration-500 hover:shadow-card-hover lg:absolute lg:top-1/2 lg:left-7 lg:mt-0 lg:-translate-y-1/2 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
         >
           <span
             class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
           ></span>
+          <!-- Honeypot : invisible pour un humain, rempli par les bots. -->
+          <input
+            type="text"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+            class="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+          />
           <p
             class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
           >
@@ -219,7 +228,7 @@ import Layout from '../layouts/Layout.astro'
         <div
           id="success"
           hidden
-          class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 text-center shadow-[0_2px_4px_rgb(0_0_0/0.04),0_24px_60px_-24px_rgb(28_25_23/0.4)] ring-1 ring-stone-900/5 lg:absolute lg:top-1/2 lg:left-7 lg:mt-0 lg:-translate-y-1/2 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
+          class="relative mt-4 overflow-hidden rounded-2xl bg-white p-6 text-center shadow-card ring-1 ring-stone-900/5 lg:absolute lg:top-1/2 lg:left-7 lg:mt-0 lg:-translate-y-1/2 lg:w-[22.5rem] lg:bg-white/95 lg:backdrop-blur"
         >
           <span
             class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
@@ -276,25 +285,17 @@ import Layout from '../layouts/Layout.astro'
 
     <!-- Agenda : prochains événements -->
     <section class="border-t border-stone-900/[0.07] py-12 sm:py-16">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p
-            class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
-          >
-            Agenda
-          </p>
-          <h2
-            class="balance mt-1.5 text-[clamp(1.7rem,3.6vw,2.4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-stone-900"
-          >
-            Prochains événements
-          </h2>
-        </div>
-        <a
-          href="/calendrier"
-          class="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-stone-400 transition-colors hover:text-brand-600 sm:inline-block"
+      <div>
+        <p
+          class="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-brand-600"
         >
-          Voir tout le calendrier&nbsp;→
-        </a>
+          Agenda
+        </p>
+        <h2
+          class="balance mt-1.5 text-[clamp(1.7rem,3.6vw,2.4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-stone-900"
+        >
+          Prochains événements
+        </h2>
       </div>
 
       <div id="ev-loading" class="py-12 text-center text-[13px] text-stone-400">
@@ -325,14 +326,9 @@ import Layout from '../layouts/Layout.astro'
         Impossible de charger les événements. Réessaie dans un instant.
       </div>
 
-      <div
-        id="ev-grid"
-        hidden
-        class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      >
-      </div>
+      <div id="ev-grid" hidden class="mt-8 grid gap-4 sm:grid-cols-2"></div>
 
-      <div id="ev-cta" hidden class="mt-10 flex justify-center">
+      <div id="ev-cta" hidden class="mt-10 text-center">
         <a
           href="/calendrier"
           class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-[14px] font-semibold text-stone-700 ring-1 ring-inset ring-stone-900/10 transition hover:text-brand-700 hover:ring-brand-300 active:translate-y-px"
@@ -351,23 +347,34 @@ import Layout from '../layouts/Layout.astro'
           </svg>
         </a>
       </div>
-    </section>
 
-    <p class="pt-4 text-center text-[12px] text-stone-400 sm:text-left">
-      Tu organises un stage ou un concert ?
-      <a
-        href="/proposer"
-        class="font-semibold text-brand-600 hover:text-brand-700"
-        >Propose ton événement</a
-      >
-    </p>
+      <p class="mt-8 text-center text-[12px] text-stone-400">
+        Tu organises un stage ou un concert ?
+        <a
+          href="/proposer"
+          class="font-semibold text-brand-600 hover:text-brand-700"
+          >Propose ton événement</a
+        >
+      </p>
+    </section>
 
     <!-- Pied micro -->
     <footer
-      class="flex items-center justify-between border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400"
+      class="border-t border-stone-900/[0.07] pb-1 pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-stone-400"
     >
-      <span>Didgeridoo &amp; culture aborigène</span>
-      <span>Belgique · <span class="text-brand-600">WhatsApp</span></span>
+      <div class="flex items-center justify-between">
+        <span>Didgeridoo &amp; culture aborigène</span>
+        <span>Belgique · <span class="text-brand-600">WhatsApp</span></span>
+      </div>
+      <div class="mt-2 flex items-center gap-3 normal-case tracking-normal">
+        <a href="/confidentialite" class="hover:text-stone-600"
+          >Confidentialité</a
+        >
+        <span>·</span>
+        <a href="/mentions-legales" class="hover:text-stone-600"
+          >Mentions légales</a
+        >
+      </div>
     </footer>
   </div>
 
@@ -436,6 +443,7 @@ import Layout from '../layouts/Layout.astro'
         email: String(data.get('email') ?? ''),
         country: String(data.get('country') ?? ''),
         consent: data.get('consent') === 'on',
+        website: String(data.get('website') ?? ''),
       }
 
       button.disabled = true
@@ -471,12 +479,22 @@ import Layout from '../layouts/Layout.astro'
       slug: string
       start: string
       location?: string
+      description?: string
       poster?: string
       category?: string
       sessions?: Session[]
     }
 
     const API_BASE = (import.meta.env.PUBLIC_API_BASE ?? '').replace(/\/$/, '')
+
+    function stripHtml(s: string): string {
+      return s
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim()
+    }
 
     const CATEGORIES: Record<string, string> = {
       stage: 'Stage',
@@ -523,26 +541,21 @@ import Layout from '../layouts/Layout.astro'
       const a = document.createElement('a')
       a.href = `/evenements/${ev.slug}`
       a.className =
-        'group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-stone-900/5 shadow-[0_1px_2px_rgb(0_0_0/0.04)] transition hover:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(28_25_23/0.4)] hover:ring-brand-200'
+        'group flex gap-4 rounded-2xl bg-white p-3.5 ring-1 ring-stone-900/5 shadow-card transition hover:shadow-card-hover hover:ring-brand-200'
 
       const thumb = document.createElement('div')
       thumb.className =
-        'relative aspect-[4/3] w-full overflow-hidden bg-brand-100'
+        'relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-brand-100 ring-1 ring-inset ring-stone-900/5 sm:h-28 sm:w-28'
+      const img = document.createElement('img')
       const src = posterUrl(ev)
-      if (src) {
-        const img = document.createElement('img')
-        img.src = src
-        img.alt = `Affiche : ${ev.title}`
-        img.loading = 'lazy'
-        img.className = 'h-full w-full object-cover'
-        thumb.appendChild(img)
-      } else {
-        thumb.innerHTML =
-          '<span class="flex h-full w-full items-center justify-center text-3xl">🪘</span>'
-      }
+      img.src = src ?? '/didge-placeholder.webp'
+      img.alt = src ? `Affiche : ${ev.title}` : ''
+      img.loading = 'lazy'
+      img.className = 'h-full w-full object-cover'
+      thumb.appendChild(img)
 
       const body = document.createElement('div')
-      body.className = 'flex min-w-0 flex-col gap-1 p-4'
+      body.className = 'flex min-w-0 flex-col justify-center gap-1 py-1'
 
       const start = parseDate(ev.start)
       const dateLine = document.createElement('p')
@@ -565,10 +578,19 @@ import Layout from '../layouts/Layout.astro'
 
       const title = document.createElement('h3')
       title.className =
-        'text-[16px] font-bold leading-snug tracking-tight text-stone-900'
+        'truncate text-[16px] font-bold leading-snug tracking-tight text-stone-900'
       title.textContent = ev.title
 
       body.appendChild(title)
+
+      const excerpt = ev.description ? stripHtml(ev.description) : ''
+      if (excerpt) {
+        const desc = document.createElement('p')
+        desc.className =
+          'line-clamp-2 text-[12.5px] leading-relaxed text-stone-500'
+        desc.textContent = excerpt
+        body.appendChild(desc)
+      }
 
       if (ev.category && CATEGORIES[ev.category]) {
         const badge = document.createElement('span')

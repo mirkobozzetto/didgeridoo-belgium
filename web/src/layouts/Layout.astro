@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css'
+import { didgeridooMark } from '../lib/didgeridoo'
 
 interface Props {
   title?: string
@@ -9,6 +10,8 @@ const {
   title = 'Didgeridoo & Culture Aborigène — Belgique',
   description = 'Rejoins la communauté belge du didgeridoo : stages, concerts et rencontres autour de la culture aborigène.',
 } = Astro.props
+
+const favicon = `data:image/svg+xml,${encodeURIComponent(didgeridooMark)}`
 ---
 
 <!doctype html>
@@ -24,10 +27,7 @@ const {
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AA%98%3C/text%3E%3C/svg%3E"
-    />
+    <link rel="icon" type="image/svg+xml" href={favicon} />
   </head>
   <body class="min-h-[100dvh] bg-brand-50 text-stone-800 antialiased">
     <slot />

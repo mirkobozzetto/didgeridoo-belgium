@@ -1,0 +1,77 @@
+---
+import Layout from '../layouts/Layout.astro'
+import PageShell from '../layouts/PageShell.astro'
+import Brand from '../components/Brand.astro'
+
+const h2 = 'mt-8 text-[15px] font-bold tracking-tight text-stone-900 first:mt-0'
+const p = 'pretty mt-2 text-[13.5px] leading-relaxed text-stone-600'
+---
+
+<Layout title="Politique de confidentialité — Didgeridoo Belgique">
+  <PageShell width="2xl">
+    <header class="pb-8 pt-2 text-center">
+      <Brand />
+    </header>
+
+    <article
+      class="relative overflow-hidden rounded-2xl bg-white p-7 shadow-card ring-1 ring-stone-900/5 sm:p-9"
+    >
+      <span
+        class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-600 via-brand-400 to-transparent"
+      ></span>
+
+      <h1 class="text-[21px] font-bold tracking-tight text-stone-900">
+        Politique de confidentialité
+      </h1>
+      <p class={p}>
+        Cette page décrit ce que nous collectons, pourquoi, et tes droits.
+      </p>
+
+      <h2 class={h2}>Ce que nous collectons</h2>
+      <p class={p}>
+        Inscription à la liste : adresse e-mail, prénom (facultatif) et pays
+        (facultatif). Compte organisateur : adresse e-mail, nom et les
+        événements que tu proposes.
+      </p>
+
+      <h2 class={h2}>Pourquoi</h2>
+      <p class={p}>
+        Uniquement pour t'envoyer les annonces d'événements didgeridoo en
+        Belgique et gérer les propositions d'événements. Aucune revente, aucune
+        publicité tierce.
+      </p>
+
+      <h2 class={h2}>Où vont les données</h2>
+      <p class={p}>
+        Les e-mails de la liste sont gérés par Brevo (sous-traitant, hébergement
+        dans l'Union européenne), qui assure aussi l'envoi des e-mails. Les
+        comptes organisateurs sont stockés sur notre propre serveur dans l'Union
+        européenne.
+      </p>
+
+      <h2 class={h2}>Combien de temps</h2>
+      <p class={p}>
+        Tant que tu restes inscrit. La désinscription se fait en un clic depuis
+        n'importe quel e-mail reçu, et supprime ton adresse de la liste.
+      </p>
+
+      <h2 class={h2}>Tes droits</h2>
+      <p class={p}>
+        Accès, rectification, suppression : écris à
+        <a
+          href="mailto:didgeridoo@mirko.re"
+          class="font-semibold text-brand-600 hover:text-brand-700"
+          >didgeridoo@mirko.re</a
+        >. Réponse sous 30 jours (RGPD).
+      </p>
+    </article>
+
+    <p class="mt-6 text-center text-[11.5px] text-stone-400">
+      <a href="/" class="hover:text-stone-600">Retour à l'accueil</a>
+      <span class="mx-2">·</span>
+      <a href="/mentions-legales" class="hover:text-stone-600"
+        >Mentions légales</a
+      >
+    </p>
+  </PageShell>
+</Layout>
